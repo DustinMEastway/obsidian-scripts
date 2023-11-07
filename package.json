@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "esbuild": "^0.19.5"
+  },
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "node build-directory.mjs src/scripts scripts",
+    "build:w": "yarn build --watch"
+  }
+}
