@@ -1,11 +1,16 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "module": "esnext",
+    "lib": [
+      "esnext"
+    ],
+    "module": "CommonJS",
     "moduleResolution": "node",
     "paths": {
-      "@/": ["src/libs/*"]
+      "@": ["src/libs"],
+      "@/*": ["src/libs/*"]
     },
     "rootDir": ".",
+    "strict": true
   }
 }
