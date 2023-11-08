@@ -5,6 +5,6 @@ export enum HttpRequestMethod {
 export type HttpRequest = {
   headers?: Record<string, string>;
   method?: HttpRequestMethod;
-  query?: Record<string, string>;
+  query?: Record<string, number | string>;
   url: string;
 }

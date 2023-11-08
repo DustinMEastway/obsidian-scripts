@@ -17,7 +17,7 @@ declare global {
     searchParams: {
       append(
         key: string,
-        value: string
+        value: number | string
       ): void;
     };
   }

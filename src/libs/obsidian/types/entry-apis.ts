@@ -30,5 +30,5 @@ export type EntryApis = {
       setClipboard(text: string): Promise<void>;
     };
   };
-  variables: unknown;
+  variables: Record<string, unknown> | null;
 }
