@@ -4,7 +4,9 @@ import {
 } from 'esbuild';
 import {
   readdir as readDirectory,
-  stat
+  readFile,
+  stat,
+  writeFile
 } from 'fs/promises';
 import {
   join as joinPath,
@@ -12,6 +14,20 @@ import {
 } from 'path';
 
 let [,, source, destination] = process.argv;
+let extraDestinations = [];
+const notesSyncPath = process.env.NOTES_SYNC_PATH;
+if (destination.includes(',') || notesSyncPath) {
+  extraDestinations = [
+    ...destination.split(','),
+    (notesSyncPath) ? `${notesSyncPath}/Core/Script` : null
+  ].filter((path) => {
+    return !!path;
+  }).map((path) => {
+    return resolvePath(path);
+  });
+  destination = extraDestinations.pop();
+}
+
 destination = resolvePath(destination);
 source = resolvePath(source);
 const watch = process.argv.some((arg) => {
@@ -51,7 +67,31 @@ await Promise.all(files.map(async (file) => {
   };
 
   if (watch) {
-    const ctx = await context(config);
+    const ctx = await context({
+      ...config,
+      plugins: [
+        {
+          name: 'extra-destinations-copy',
+          setup: (build) => {
+            build.onEnd(async () => {
+              if (!extraDestinations.length) {
+                return;
+              }
+
+              const content = await readFile(destinationFile);
+              await Promise.all(
+                extraDestinations.map(async (extraDestination) => {
+                  await writeFile(
+                    destinationFile.replace(destination, extraDestination),
+                    content
+                  );
+                })
+              );
+            });
+          }
+        }
+      ]
+    });
     await ctx.watch();
   } else {
     await build(config);

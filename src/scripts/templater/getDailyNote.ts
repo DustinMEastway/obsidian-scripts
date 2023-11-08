@@ -1,4 +1,4 @@
-import { formatDate } from "@";
+import { createMarkdownLink, formatDate } from "@";
 
 const msInADay = 24 * 60 * 60 * 1000;
 
@@ -13,5 +13,8 @@ export = function (
     oldDate.getTime() + (shift * msInADay)
   );
 
-  return `[[Database/Note/DailyNote/${newDateString}|${newDateString}]]`;
+  return createMarkdownLink(
+    'Database/Note/DailyNote',
+    newDateString
+  );
 }

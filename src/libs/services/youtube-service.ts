@@ -193,6 +193,7 @@ export class YoutubeService {
     if (chaptersMatch) {
       description = (
         description.slice(0, chaptersMatch.index).trim()
+        + '\n\n'
         + description.slice(chaptersMatch.index + chaptersMatch[0].length).trim()
       );
       chapters = chaptersMatch[1].trim().split(/\s*\n\s*/).map((chapter) => {
