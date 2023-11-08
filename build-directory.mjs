@@ -3,7 +3,8 @@ import {
   context
 } from 'esbuild';
 import {
-  readdir as readDirectory
+  readdir as readDirectory,
+  stat
 } from 'fs/promises';
 import {
   join as joinPath,
@@ -17,14 +18,25 @@ const watch = process.argv.some((arg) => {
   return arg === '--watch';
 });
 
-const filesToIgnore = new Set(['.DS_Store']);
-const files = (await readDirectory(source)).filter((fileName) => {
-  return !filesToIgnore.has(fileName);
-});
+const extensionsToBuild = new Set(['ts']);
+async function getPathsToBuild(directory) {
+  const paths = [];
+  const items = await readDirectory(directory);
+  for (const item of items) {
+    const path = joinPath(directory, item);
+    if ((await stat(path)).isDirectory()) {
+      paths.push(...await getPathsToBuild(path));
+    } else if (extensionsToBuild.has(path.replace(/.*\.(.*)/, '$1'))) {
+      paths.push(path);
+    }
+  }
 
+  return paths;
+}
+
+const files = await getPathsToBuild(source);
 await Promise.all(files.map(async (file) => {
-  const sourceFile = joinPath(source, file);
-  const destinationFile = sourceFile.replace(
+  const destinationFile = file.replace(
     source,
     destination
   ).replace(
@@ -33,7 +45,7 @@ await Promise.all(files.map(async (file) => {
   );
   const config = {
     bundle: true,
-    entryPoints: [sourceFile],
+    entryPoints: [file],
     format: 'cjs',
     outfile: destinationFile
   };
