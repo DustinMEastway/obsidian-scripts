@@ -138,6 +138,7 @@ export class GoodreadsService {
         { book: { bookTitleBare: bookTitle } },
         index
       ) => {
+        bookTitle = removeHtmlTags(bookTitle);
         const bookAlias = `${bookTitle} (${seriesHeaders[index]})`;
 
         return `## ${bookAlias}\n![[Database/Text/Book/${bookTitle}]]`;

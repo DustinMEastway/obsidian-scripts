@@ -1,3 +1,5 @@
+import { RawGoodreadsBookSeriesData } from './raw-goodreads-book-series-data';
+
 export type RawGoodreadsBookSeriesBooks = {
   series: {
     book: {
@@ -37,10 +39,10 @@ export type RawGoodreadsBookSeriesBooks = {
   seriesHeaders: string[];
 };
 
-export module RawGoodreadsBookSeriesBooks {
-  export function is(
+export const RawGoodreadsBookSeriesBooks = {
+  is(
     data: RawGoodreadsBookSeriesData
   ): data is RawGoodreadsBookSeriesBooks {
     return 'series' in data;
   }
-}
+};

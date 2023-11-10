@@ -1,5 +1,6 @@
 const tagsSearch = /<!--(?:[\s\S]*?)-->|<([0-9a-zA-Z]+\b)[\s\S]*?>([\s\S]*?)<\/\1>/g;
 const characterMap = new Map([
+  [/&#39;/, '\''],
   [/&lt;/g, '\\<'],
   [/&gt;/g, '\\>']
 ]);
