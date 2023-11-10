@@ -78,7 +78,7 @@ const options = createSettingOptions<Settings>({
     value: ApiUrl.omdb
   },
   mediaType: {
-    label: 'MediaType',
+    label: 'Media Type',
     options: Object.values(OmdbMediaType),
     type: SettingOptionType.dropdown,
     value: OmdbMediaType.movie

@@ -20,8 +20,8 @@ export function createSettingOptions<T>(
         option.label,
         {
           ...option,
-          key: key as keyof(T) & string,
-          value: option.value as T[keyof(T)]
+          defaultValue: option.value as T[keyof(T)],
+          key: key as keyof(T) & string
         }
       ];
     })

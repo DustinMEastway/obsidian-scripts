@@ -5,6 +5,7 @@ const characterMap = new Map([
 ]);
 
 export function removeHtmlTags(html: string): string {
+  html = html.replace(/<br\b[\s\S]*?\/>/g, '\n');
   while (tagsSearch.test(html)) {
     html = html.replace(tagsSearch, '$2');
   }

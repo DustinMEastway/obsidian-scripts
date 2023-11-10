@@ -2,6 +2,7 @@ import {
   createMarkdownArray,
   createMarkdownFileName
 } from '@/markdown';
+import { convertRating } from '@/number';
 import { camelCaseObject } from '@/object';
 import { createError } from '@/obsidian';
 import { HttpService } from './http-service';
@@ -92,13 +93,13 @@ export class OmdbService {
 
     return {
       ...item,
-      actorLinks: this._convertArray(actors, 'Database/Characters/Nonfiction'),
-      directorLinks: this._convertArray(director, 'Database/Characters/Nonfiction'),
+      actorLinks: this._convertArray(actors, 'Database/Character/Nonfiction'),
+      directorLinks: this._convertArray(director, 'Database/Character/Nonfiction'),
       fileName: createMarkdownFileName(
         this.convertTitle(item)
       ),
       genreLinks: this._convertArray(genre, 'Database/Meta/Genre'),
-      imdbRating: imdbRating * 10,
+      imdbRating: this._convertRating(imdbRating),
       type
     };
   }
@@ -111,6 +112,14 @@ export class OmdbService {
       itemsString?.split(','),
       { linkDirectory }
     ) ?? '';
+  }
+
+  private _convertRating(rating: null | number): null | number {
+    return convertRating({
+      maxValue: 10,
+      minValue: 1,
+      value: rating
+    });
   }
 
   private _convertType(type: string): OmdbMediaType {
