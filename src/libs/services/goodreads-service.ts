@@ -7,14 +7,22 @@ import {
 } from '@/markdown';
 import { convertRating } from '@/number';
 import { createError } from '@/obsidian';
+import { getAllMatches } from '@/string';
 import { HttpService } from './http-service';
 import {
   GoodreadsBook,
+  GoodreadsBookSeries,
   RawGoodreadsBook,
+  RawGoodreadsBookSeriesBooks,
+  RawGoodreadsBookSeriesData,
+  RawGoodreadsBookSeriesDescription,
+  RawGoodreadsBookSeriesNumWorks,
   RawGoodreadsContributorRole,
   RawGoodreadsNextData,
   RawGoodreadsType
 } from './types';
+
+const seriesDataSearch = /\bdata-react-props="([\s\S]*?)"/g;
 
 export class GoodreadsService {
   constructor(
@@ -98,6 +106,53 @@ export class GoodreadsService {
         seriesLinks
       ),
       title: rawBook.title,
+      url
+    };
+  }
+
+  async getBookSeries(url: string): Promise<GoodreadsBookSeries> {
+    const content = await this._httpService.fetch({ url });
+    const seriesData = getAllMatches(seriesDataSearch, content).map(([
+      _,
+      stringData
+    ]) => {
+      return JSON.parse(
+        stringData.replace(/&quot;/g, '"')
+      ) as RawGoodreadsBookSeriesData;
+    });
+    const {
+      description,
+      title
+    } = seriesData.find(RawGoodreadsBookSeriesDescription.is) ?? {};
+    const {
+      numWorks
+    } = seriesData.find(RawGoodreadsBookSeriesNumWorks.is) ?? {};
+    const booksData = seriesData.filter(
+      RawGoodreadsBookSeriesBooks.is
+    );
+    const books = booksData.map(({
+      series,
+      seriesHeaders
+    }) => {
+      return series.map((
+        { book: { bookTitleBare: bookTitle } },
+        index
+      ) => {
+        const bookAlias = `${bookTitle} (${seriesHeaders[index]})`;
+
+        return `## ${bookAlias}\n![[Database/Text/Book/${bookTitle}]]`;
+      }).join('\n');
+    }).join('\n');
+
+    return {
+      authorLinks: createMarkdownArray(
+        [booksData[0].series[0].book.author.name],
+        { linkDirectory: 'Database/Meta/Author' }
+      ),
+      bookCount: numWorks ?? 0,
+      books,
+      description: removeHtmlTags(description?.html ?? ''),
+      title: title ?? '',
       url
     };
   }

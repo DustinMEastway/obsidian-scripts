@@ -1,4 +1,5 @@
 export * from './goodreads-book';
+export * from './goodreads-book-series';
 export * from './goodreads-media-type';
 export * from './raw-goodreads-apollo-state';
 export * from './raw-goodreads-award';
@@ -9,6 +10,10 @@ export * from './raw-goodreads-book-details';
 export * from './raw-goodreads-book-genre';
 export * from './raw-goodreads-book-or-work-stats';
 export * from './raw-goodreads-book-series';
+export * from './raw-goodreads-book-series-books';
+export * from './raw-goodreads-book-series-description';
+export * from './raw-goodreads-book-series-data';
+export * from './raw-goodreads-book-series-num-works';
 export * from './raw-goodreads-character';
 export * from './raw-goodreads-contributor';
 export * from './raw-goodreads-contributor-role';

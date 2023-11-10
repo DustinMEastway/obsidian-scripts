@@ -1,3 +1,4 @@
 export enum GoodreadsMediaType {
-  book = 'Book'
+  book = 'Book',
+  bookSeries = 'Book Series'
 }
