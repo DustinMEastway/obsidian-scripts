@@ -10,6 +10,7 @@ import { createError } from '@/obsidian';
 import { getAllMatches } from '@/string';
 import { HttpService } from './http-service';
 import {
+  GoodreadsAuthor,
   GoodreadsBook,
   GoodreadsBookSeries,
   RawGoodreadsBook,
@@ -22,7 +23,14 @@ import {
   RawGoodreadsType
 } from './types';
 
-const seriesDataSearch = /\bdata-react-props="([\s\S]*?)"/g;
+const searches = {
+  authorCover: /<meta\b[^>]*?\bitemprop="image"[^>]*?\bcontent="([^"]+)">/,
+  authorDescription: /<span id="freeText[^"]*author[\s\S]*?<\/span>/,
+  authorId: /goodreads\.com\/author\/show\/(\d+\.[^?]+)/,
+  authorSeries: /<div class="seriesDesc"[^>]*>\s*(<span itemprop='name'[\s\S]*?<\/span>)\s*(<span class="bookMeta">[\s\S]*?<\/span>)/g,
+  authorTitle: /<h1\b[\s\S]*?\bclass="authorName"[\s\S]*?<\/h1>/,
+  seriesData: /\bdata-react-props="([\s\S]*?)"/g
+}
 
 export class GoodreadsService {
   constructor(
@@ -35,6 +43,44 @@ export class GoodreadsService {
     return new GoodreadsService(
       new HttpService()
     );
+  }
+
+  async getAuthor(url: string): Promise<GoodreadsAuthor> {
+    const authorId = searches.authorId.exec(url)?.[1];
+    if (!authorId) {
+      throw createError(`Unable to find author ID in URL '${url}'.`);
+    }
+
+    url = `https://www.goodreads.com/author/show/${authorId}`;
+    const [
+      mainContent,
+      seriesListContent
+    ] = await Promise.all([
+      this._httpService.fetch({ url }),
+      this._httpService.fetch({
+        url: `https://www.goodreads.com/series/list?id=${authorId}`
+      })
+    ]);
+    const cover = searches.authorCover.exec(mainContent)?.[1] ?? '';
+    const description = removeHtmlTags(searches.authorDescription.exec(mainContent)?.[0] ?? '');
+    const series = getAllMatches(searches.authorSeries, seriesListContent).map(([
+      _,
+      seriesName
+    ]) => {
+      return removeHtmlTags(seriesName);
+    });
+    const title = removeHtmlTags(searches.authorTitle.exec(mainContent)?.[0] ?? '');
+
+    return {
+      cover,
+      description,
+      seriesLinks: createMarkdownArray(
+        series,
+        { linkDirectory: 'Database/Meta/BookSeries' }
+      ),
+      title,
+      url
+    };
   }
 
   async getBook(url: string): Promise<GoodreadsBook> {
@@ -112,7 +158,7 @@ export class GoodreadsService {
 
   async getBookSeries(url: string): Promise<GoodreadsBookSeries> {
     const content = await this._httpService.fetch({ url });
-    const seriesData = getAllMatches(seriesDataSearch, content).map(([
+    const seriesData = getAllMatches(searches.seriesData, content).map(([
       _,
       stringData
     ]) => {

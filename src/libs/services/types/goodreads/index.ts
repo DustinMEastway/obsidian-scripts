@@ -1,3 +1,4 @@
+export * from './goodreads-author';
 export * from './goodreads-book';
 export * from './goodreads-book-series';
 export * from './goodreads-media-type';

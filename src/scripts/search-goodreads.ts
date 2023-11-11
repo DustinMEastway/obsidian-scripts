@@ -35,7 +35,9 @@ async function entry(
   }
 
   let item: typeof entryApis.variables = null;
-  if (mediaType === GoodreadsMediaType.book) {
+  if (mediaType === GoodreadsMediaType.author) {
+    item = await goodreadsService.getAuthor(query);
+  } else if (mediaType === GoodreadsMediaType.book) {
     item = await goodreadsService.getBook(query);
   } else if (mediaType === GoodreadsMediaType.bookSeries) {
     item = await goodreadsService.getBookSeries(query);
