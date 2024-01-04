@@ -1,4 +1,4 @@
-import { createMarkdownLink, formatDate } from "@";
+import { createMarkdownLink, formatDate } from '@';
 
 const msInADay = 24 * 60 * 60 * 1000;
 

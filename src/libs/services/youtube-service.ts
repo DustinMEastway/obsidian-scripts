@@ -1,4 +1,9 @@
+import { formatDatetime } from '@/date';
 import { createMarkdownLink } from '@/markdown';
+import {
+  TimeInMs,
+  convertTimestamp
+} from '@/number';
 import { createError } from '@/obsidian';
 import { youtubeUrl } from './constants';
 import { HttpService } from './http-service';
@@ -15,10 +20,6 @@ import {
   YoutubeSearchItem,
   YoutubeVideo
 } from './types';
-import {
-  TimeInMs,
-  convertTimestamp
-} from '@/number';
 
 const rawDataSearch = /ytInitialData\s*=\s*({[\s\S]+?});\s*<\/script>/;
 const mediaTypeBackMap = new Map([
@@ -75,7 +76,7 @@ export class YoutubeService {
   }
 
   async getVideo(id: string): Promise<YoutubeVideo | null> {
-    const video = (
+    const videos = (
       await this._apiHttpService.fetchJson<YoutubePage<RawYoutubeVideo>>({
         query: {
           id,
@@ -83,7 +84,12 @@ export class YoutubeService {
         },
         url: 'videos'
       })
-    ).items[0] ?? null;
+    ).items;
+    if (videos.length !== 1) {
+      throw new Error(`Expected 1 video but got ${videos.length}`);
+    }
+
+    const video = videos[0];
     const videoData = JSON.parse(
       rawDataSearch.exec(
         await this._baseHttpService.fetch({ url: `watch?v=${id}` })
@@ -204,7 +210,8 @@ export class YoutubeService {
       }
     } = video;
     const url = `${youtubeUrl}/watch?v=${id}`;
-    let { description } = video.snippet.localized;
+    const { localized, publishedAt } = video.snippet;
+    const { description } = localized;
     const { markersMap } = videoData.playerOverlays.playerOverlayRenderer.decoratedPlayerBarRenderer.decoratedPlayerBarRenderer.playerBar.multiMarkersPlayerBarRenderer;
     const chapters = markersMap.find(({ key }) => {
       return (
@@ -230,6 +237,7 @@ export class YoutubeService {
       chapters: (chapters) ? `\n\n${chapters}` : '',
       description: (description) ? `\n\n${description}` : '',
       id,
+      publishedOn: formatDatetime(publishedAt),
       thumbnail: highThumbnail ?? defaultThumbnail,
       title,
       url

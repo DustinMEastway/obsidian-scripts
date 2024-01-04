@@ -1,5 +1,5 @@
 import { getApolloRefFactory } from '@/apollo';
-import { formatDate } from '@/date';
+import { formatDatetime } from '@/date';
 import { removeHtmlTags } from '@/html';
 import {
   createMarkdownArray,
@@ -147,7 +147,7 @@ export class GoodreadsService {
         { linkDirectory: 'Core/Meta/Genre' }
       ),
       pageCount: rawBook.details.numPages,
-      publishedOn: formatDate(work.details.publicationTime),
+      publishedOn: formatDatetime(work.details.publicationTime),
       ratingsGoodreads: this._convertRating(work.stats.averageRating),
       seriesLinks: createMarkdownArray(
         seriesLinks

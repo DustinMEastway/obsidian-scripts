@@ -6,6 +6,7 @@ export type RawYoutubeVideo = {
       description: string;
       title: string;
     };
+    publishedAt: string;
     thumbnails: {
       default: {
         url: string;
