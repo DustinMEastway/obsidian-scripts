@@ -8,16 +8,16 @@ export type CreateMarkdownArrayConfig = {
 }
 
 export function createMarkdownArray(
-  items: string[],
+  items: string[] | null | undefined,
   {
     indentation = 1,
     linkDirectory = null,
     prefix = '',
     suffix = ''
   }: CreateMarkdownArrayConfig = {}
-): null | string {
-  if (!(items instanceof Array)) {
-    return null;
+): string {
+  if (!items?.length) {
+    return 'null';
   }
 
   const spaces = '  '.repeat(indentation);

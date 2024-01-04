@@ -1,11 +1,16 @@
 import {
   EntryApis,
+  GoodreadsAuthor,
+  GoodreadsBook,
+  GoodreadsBookSeries,
   GoodreadsMediaType,
   GoodreadsService,
   SettingOptionType,
   createError,
+  createMarkdownFileName,
   createSettingOptions,
-  createSettingsFromOptions
+  createSettingsFromOptions,
+  getClipboard
 } from "@";
 
 interface Settings {
@@ -28,13 +33,18 @@ async function entry(
   const query = await quickAddApi.inputPrompt(
     'Enter movie title or IMDB ID: ',
     null,
-    await quickAddApi.utility.getClipboard()
+    await getClipboard(quickAddApi)
   );
   if (!query) {
       throw createError('No query entered.');
   }
 
-  let item: typeof entryApis.variables = null;
+  let item: (
+    GoodreadsAuthor
+    | GoodreadsBook
+    | GoodreadsBookSeries
+    | null
+  ) = null;
   if (mediaType === GoodreadsMediaType.author) {
     item = await goodreadsService.getAuthor(query);
   } else if (mediaType === GoodreadsMediaType.book) {
@@ -43,7 +53,10 @@ async function entry(
     item = await goodreadsService.getBookSeries(query);
   }
 
-  entryApis.variables = item;
+  entryApis.variables = (item == null) ? item : {
+    ...item,
+    fileName: createMarkdownFileName(item.title ?? '')
+  };
 }
 
 const options = createSettingOptions<Settings>({

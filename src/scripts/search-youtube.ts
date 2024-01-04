@@ -7,6 +7,7 @@ import {
   createMarkdownFileName,
   createSettingOptions,
   createSettingsFromOptions,
+  getClipboard,
   youtubeUrl
 } from "@";
 
@@ -41,7 +42,7 @@ async function entry(
   let query = await quickAddApi.inputPrompt(
     `Enter a search for ${mediaType}: `,
     null,
-    await quickAddApi.utility.getClipboard()
+    await getClipboard(quickAddApi)
   );
   if (!query) {
     throw createError('No query entered.');
@@ -95,7 +96,7 @@ async function entry(
   }
 
   if (typeof entryApis.variables?.title === 'string') {
-    entryApis.variables.title = createMarkdownFileName(
+    entryApis.variables.fileName = createMarkdownFileName(
       entryApis.variables.title
     );
   }

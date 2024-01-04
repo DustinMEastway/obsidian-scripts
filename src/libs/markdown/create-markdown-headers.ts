@@ -1,8 +1,13 @@
-import { HtmlHeader } from '@/html';
+import {
+  HtmlHeader,
+  removeHtmlTags
+} from '@/html';
 
-export function createMarkdownHeaders(headers: HtmlHeader[]): string {
+export function createMarkdownHeaders(
+  headers: HtmlHeader[]
+): string {
   return headers.map(({ content, level }) => {
     const headerPrefix = '#'.repeat(level);
-    return `${headerPrefix} ${content}`;
+    return `\n${headerPrefix} ${removeHtmlTags(content)}`;
   }).join('\n');
 }

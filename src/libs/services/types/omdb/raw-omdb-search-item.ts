@@ -4,6 +4,7 @@ export type RawOmdbSearchItem = {
   genre: string;
   imdbId: string;
   imdbRating: null | number;
+  plot: string;
   title: string;
   type: string;
   year: string;

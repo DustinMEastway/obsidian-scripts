@@ -1,8 +1,11 @@
 const tagsSearch = /<!--(?:[\s\S]*?)-->|<([0-9a-zA-Z]+\b)[\s\S]*?>([\s\S]*?)<\/\1>/g;
 const characterMap = new Map([
-  [/&#39;/, '\''],
+  [/&#(39|x27);/, '\''],
+  [/&#8217;/g, '\''],
+  [/&#822[01];/g, '"'],
+  [/&gt;/g, '\\>'],
   [/&lt;/g, '\\<'],
-  [/&gt;/g, '\\>']
+  [/​|&nbsp;/g, ' ']
 ]);
 
 export function removeHtmlTags(html: string): string {

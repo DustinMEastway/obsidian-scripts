@@ -73,10 +73,10 @@ export class GoodreadsService {
 
     return {
       cover,
-      description,
+      description: (description) ? `\n\n${description}` : '',
       seriesLinks: createMarkdownArray(
         series,
-        { linkDirectory: 'Database/Meta/BookSeries' }
+        { linkDirectory: 'Database/BookSeries' }
       ),
       title,
       url
@@ -120,7 +120,7 @@ export class GoodreadsService {
     const seriesLinks = rawBook.bookSeries.map((series) => {
       const { title } = getApolloRef(series.series);
       return createMarkdownLink(
-        'Database/Meta/BookSeries',
+        'Database/BookSeries',
         title,
         `${title} (Book ${series.userPosition})`
       );
@@ -129,21 +129,22 @@ export class GoodreadsService {
     const characters = work.details.characters.map((character) => {
       return character.name;
     });
+    const description = removeHtmlTags(rawBook.description);
 
     return {
       authorLinks: createMarkdownArray(
         authors,
-        { linkDirectory: 'Database/Meta/Author' }
+        { linkDirectory: 'Database/Author' }
       ),
       characterLinks: createMarkdownArray(
         characters,
         { linkDirectory: charactersDirectory }
       ),
       cover: rawBook.imageUrl,
-      description: removeHtmlTags(rawBook.description),
+      description: (description) ? `\n\n${description}` : '',
       genreLinks: createMarkdownArray(
         genres,
-        { linkDirectory: 'Database/Meta/Genre' }
+        { linkDirectory: 'Core/Meta/Genre' }
       ),
       pageCount: rawBook.details.numPages,
       publishedOn: formatDate(work.details.publicationTime),
@@ -167,9 +168,10 @@ export class GoodreadsService {
       ) as RawGoodreadsBookSeriesData;
     });
     const {
-      description,
+      description: rawDescription,
       title
     } = seriesData.find(RawGoodreadsBookSeriesDescription.is) ?? {};
+    const description = removeHtmlTags(rawDescription?.html ?? '');
     const {
       numWorks
     } = seriesData.find(RawGoodreadsBookSeriesNumWorks.is) ?? {};
@@ -187,18 +189,18 @@ export class GoodreadsService {
         bookTitle = removeHtmlTags(bookTitle);
         const bookAlias = `${bookTitle} (${seriesHeaders[index]})`;
 
-        return `## ${bookAlias}\n![[Database/Text/Book/${bookTitle}]]`;
-      }).join('\n');
-    }).join('\n');
+        return `## ${bookAlias}\n\n![[Database/Book/${bookTitle}]]`;
+      }).join('\n\n');
+    }).join('\n\n');
 
     return {
       authorLinks: createMarkdownArray(
         [booksData[0].series[0].book.author.name],
-        { linkDirectory: 'Database/Meta/Author' }
+        { linkDirectory: 'Database/Author' }
       ),
       bookCount: numWorks ?? 0,
-      books,
-      description: removeHtmlTags(description?.html ?? ''),
+      books: (books) ? `\n\n${books}` : '',
+      description: (description) ? `\n\n${description}`: '',
       title: title ?? '',
       url
     };

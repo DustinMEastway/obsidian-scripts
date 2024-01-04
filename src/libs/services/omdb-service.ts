@@ -87,7 +87,8 @@ export class OmdbService {
       actors,
       director,
       genre,
-      imdbRating
+      imdbRating,
+      plot
     } = item;
     const type = this._convertType(item.type);
 
@@ -98,8 +99,9 @@ export class OmdbService {
       fileName: createMarkdownFileName(
         this.convertTitle(item)
       ),
-      genreLinks: this._convertArray(genre, 'Database/Meta/Genre'),
+      genreLinks: this._convertArray(genre, 'Core/Meta/Genre'),
       imdbRating: this._convertRating(imdbRating),
+      plot: (plot) ? `\n\n${plot}` : '',
       type
     };
   }
@@ -108,8 +110,8 @@ export class OmdbService {
     itemsString: string,
     linkDirectory: string
   ): string {
-    return (itemsString === 'N/A') ? '' : createMarkdownArray(
-      itemsString?.split(','),
+    return createMarkdownArray(
+      (itemsString === 'N/A') ? null : itemsString?.split(','),
       { linkDirectory }
     ) ?? '';
   }

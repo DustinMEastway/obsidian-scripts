@@ -4,6 +4,7 @@ import {
   createError,
   createMarkdownFileName,
   createMarkdownHeaders,
+  getClipboard,
   getHtmlHeaders,
   getHtmlTitle
 } from "@";
@@ -15,7 +16,7 @@ async function entry(
   const query = await quickAddApi.inputPrompt(
     'Enter article URL: ',
     null,
-    await quickAddApi.utility.getClipboard()
+    await getClipboard(quickAddApi)
   );
   if (!query) {
     throw createError('No query entered.');
@@ -25,14 +26,15 @@ async function entry(
     url: query,
     method: HttpRequestMethod.get
   });
+  const headers = createMarkdownHeaders(
+    getHtmlHeaders(response).map((header) => {
+      header.level += 1;
+      return header;
+    })
+  );
 
   entryApis.variables = {
-    headers: createMarkdownHeaders(
-      getHtmlHeaders(response).map((header) => {
-        header.level += 1;
-        return header;
-      })
-    ),
+    headers: (headers) ? `\n${headers}` : '',
     fileName: createMarkdownFileName(getHtmlTitle(response) ?? ''),
     url: query
   };

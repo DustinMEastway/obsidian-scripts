@@ -5,7 +5,8 @@ import {
   SettingOptionType,
   createError,
   createSettingOptions,
-  createSettingsFromOptions
+  createSettingsFromOptions,
+  getClipboard
 } from '@';
 
 enum ApiUrl {
@@ -41,7 +42,7 @@ async function entry(
   let query = await quickAddApi.inputPrompt(
     'Enter movie title or IMDB ID: ',
     null,
-    await quickAddApi.utility.getClipboard()
+    await getClipboard(quickAddApi)
   );
   if (!query) {
       throw createError('No query entered.');

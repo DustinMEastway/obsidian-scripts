@@ -7,15 +7,20 @@ import {
   RawYoutubeMediaType,
   RawYoutubeSearchItem,
   RawYoutubeVideo,
+  RawYoutubeVideoV2,
+  RawYoutubeVideoV2MarkerKey,
   YoutubeChannel,
   YoutubeMediaType,
   YoutubePage,
   YoutubeSearchItem,
   YoutubeVideo
 } from './types';
+import {
+  TimeInMs,
+  convertTimestamp
+} from '@/number';
 
-const chapterTimeSearch = /^(\d+(?::\d+)*) *[\-:]? +(.*) *|(.*?) *[\-:]? +(\d+(?::\d+)*) *$/;
-const chaptersSearch = /((?: *\n?.* \d+(:\d+)+| *\n?\d+(:\d+)+ .*){2,})/mi;
+const rawDataSearch = /ytInitialData\s*=\s*({[\s\S]+?});\s*<\/script>/;
 const mediaTypeBackMap = new Map([
   [YoutubeMediaType.channel, RawYoutubeMediaType.channel],
   [YoutubeMediaType.video, RawYoutubeMediaType.video]
@@ -23,7 +28,8 @@ const mediaTypeBackMap = new Map([
 
 export class YoutubeService {
   constructor(
-    private _httpService: HttpService,
+    private _apiHttpService: HttpService,
+    private _baseHttpService: HttpService,
     private _mediaType: YoutubeMediaType
   ) {
     // Intentionally left blank.
@@ -40,20 +46,20 @@ export class YoutubeService {
   }): YoutubeService {
     return new YoutubeService(
       new HttpService(
-        null,
+        apiUrl,
         [(requestConfig) => {
-          requestConfig.url = `${apiUrl}/${requestConfig.url}`;
           requestConfig.query ??= {};
           requestConfig.query.key = apiKey;
           return requestConfig;
         }]
       ),
+      new HttpService(youtubeUrl),
       mediaType
     );
   }
 
   async getChannel(id: string): Promise<YoutubeChannel | null> {
-    const channels = (await this._httpService.fetchJson<
+    const channels = (await this._apiHttpService.fetchJson<
       YoutubePage<RawYoutubeChannel>
     >({
       query: {
@@ -69,23 +75,31 @@ export class YoutubeService {
   }
 
   async getVideo(id: string): Promise<YoutubeVideo | null> {
-    const videos = (
-      await this._httpService.fetchJson<YoutubePage<RawYoutubeVideo>>({
+    const video = (
+      await this._apiHttpService.fetchJson<YoutubePage<RawYoutubeVideo>>({
         query: {
           id,
           part: 'id,snippet'
         },
         url: 'videos'
       })
-    ).items ?? [];
+    ).items[0] ?? null;
+    const videoData = JSON.parse(
+      rawDataSearch.exec(
+        await this._baseHttpService.fetch({ url: `watch?v=${id}` })
+      )?.[1] ?? 'null'
+    ) as RawYoutubeVideoV2;
 
-    return (videos.length) ? (
-      this._convertVideo(videos[0])
+    return (video) ? (
+      this._convertVideo(
+        video,
+        videoData
+      )
     ) : null;
   }
 
   async search(query: string): Promise<YoutubeSearchItem[]> {
-    return ((await this._httpService.fetchJson<
+    return ((await this._apiHttpService.fetchJson<
       YoutubePage<RawYoutubeSearchItem>
     >({
       query: {
@@ -168,7 +182,10 @@ export class YoutubeService {
     };
   }
 
-  private _convertVideo(video: RawYoutubeVideo): YoutubeVideo {
+  private _convertVideo(
+    video: RawYoutubeVideo,
+    videoData: RawYoutubeVideoV2
+  ): YoutubeVideo {
     const {
       id,
       snippet: {
@@ -188,51 +205,30 @@ export class YoutubeService {
     } = video;
     const url = `${youtubeUrl}/watch?v=${id}`;
     let { description } = video.snippet.localized;
-    let chapters = '';
-    const chaptersMatch = chaptersSearch.exec(description);
-    if (chaptersMatch) {
-      description = (
-        description.slice(0, chaptersMatch.index).trim()
-        + '\n\n'
-        + description.slice(chaptersMatch.index + chaptersMatch[0].length).trim()
+    const { markersMap } = videoData.playerOverlays.playerOverlayRenderer.decoratedPlayerBarRenderer.decoratedPlayerBarRenderer.playerBar.multiMarkersPlayerBarRenderer;
+    const chapters = markersMap.find(({ key }) => {
+      return (
+        key === RawYoutubeVideoV2MarkerKey.autoChapters
+        || key === RawYoutubeVideoV2MarkerKey.descriptionChapters
       );
-      chapters = chaptersMatch[1].trim().split(/\s*\n\s*/).map((chapter) => {
-        // There are multiple times and titles because they can be a the beginning or end.
-        const [_, time1, title1, title2, time2] = chapterTimeSearch.exec(chapter) ?? [];
-        const time = time1 ?? time2;
-        const title = title1 ?? title2;
-        const splitTime = time.split(':').reverse().map((t) => {
-          return parseInt(t, 10);
-        });
-
-        if (
-          splitTime.length < 1
-          || splitTime.length > 3
-          || splitTime.some((t) => isNaN(t) || t < 0)
-        ) {
-          throw createError('Chapter timestamps not formatted properly.');
-        }
-
-        const timeInSeconds = (
-          // Seconds.
-          splitTime[0]
-          // Minutes.
-          + (splitTime[1] ?? 0) * 60
-          // Hours.
-          + (splitTime[2] ?? 0) * 60 * 60
-        );
-        return `## ${title} ([${time}](${url}&t=${timeInSeconds}))`;
-      }).join('\n\n');
-    }
+    })?.value?.chapters?.map(({
+      chapterRenderer: {
+        timeRangeStartMillis: timeInMs,
+        title: { simpleText }
+      }
+    }) => {
+      const timeInSeconds = Math.round(timeInMs / TimeInMs.seconds);
+      return `## ${simpleText} ([${convertTimestamp(timeInMs)}](${url}&t=${timeInSeconds}))`;
+    }).join('\n\n') ?? '';
 
     return {
       channel: channelTitle,
       channelLink: createMarkdownLink(
-        'Database/Meta/YouTubeChannel',
+        'Database/YouTubeChannel',
         channelTitle
       ),
-      chapters,
-      description,
+      chapters: (chapters) ? `\n\n${chapters}` : '',
+      description: (description) ? `\n\n${description}` : '',
       id,
       thumbnail: highThumbnail ?? defaultThumbnail,
       title,
