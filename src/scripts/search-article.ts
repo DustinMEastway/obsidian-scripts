@@ -1,18 +1,34 @@
 import {
   EntryApis,
   HttpRequestMethod,
+  TaskStatusOption,
   createError,
   createMarkdownFileName,
   createMarkdownHeaders,
+  createSettingOptions,
+  createSettingsFromOptions,
   getClipboard,
   getHtmlHeaders,
-  getHtmlTitle
+  getHtmlTitle,
+  getWebTaskState,
+  taskStatusConfig,
 } from "@";
 
+type Settings = {
+  status: TaskStatusOption;
+}
+
 async function entry(
-  entryApis: EntryApis
+  entryApis: EntryApis,
+  configOptions: Record<string, Settings[keyof(Settings)]>
 ) {
   const { quickAddApi } = entryApis;
+  const {
+    status
+  } = createSettingsFromOptions(
+    configOptions,
+    options
+  );
   const query = await quickAddApi.inputPrompt(
     'Enter article URL: ',
     null,
@@ -36,14 +52,20 @@ async function entry(
   entryApis.variables = {
     headers: (headers) ? `\n${headers}` : '',
     fileName: createMarkdownFileName(getHtmlTitle(response) ?? ''),
-    url: query
+    url: query,
+    ...await getWebTaskState(entryApis, (status === 'null') ? null : status)
   };
 }
+
+const options = createSettingOptions<Settings>({
+  status: taskStatusConfig
+});
 
 export = {
   entry,
   settings: {
     name: 'Search article',
-    author: 'Dustin M. Eastway'
+    author: 'Dustin M. Eastway',
+    options
   }
 };

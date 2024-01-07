@@ -1,6 +1,7 @@
 import {
   EntryApis,
   SettingOptionType,
+  TaskStatusOption,
   YoutubeMediaType,
   YoutubeService,
   createError,
@@ -8,6 +9,8 @@ import {
   createSettingOptions,
   createSettingsFromOptions,
   getClipboard,
+  getWebTaskState,
+  taskStatusConfig,
   youtubeUrl
 } from "@";
 
@@ -19,6 +22,7 @@ interface Settings {
   apiKey: string;
   apiUrl: ApiUrl;
   mediaType: YoutubeMediaType;
+  status: TaskStatusOption;
 }
 
 async function entry(
@@ -29,7 +33,8 @@ async function entry(
   const {
     apiKey,
     apiUrl,
-    mediaType
+    mediaType,
+    status
   } = createSettingsFromOptions(
     configOptions,
     options
@@ -84,7 +89,10 @@ async function entry(
         const { id } = await search();
         item = await youtubeService.getVideo(id);
       }
-      entryApis.variables = item;
+      entryApis.variables = {
+        ...item,
+        ... await getWebTaskState(entryApis, status)
+      };
       break;
     }
     default:
@@ -119,7 +127,8 @@ const options = createSettingOptions<Settings>({
     options: Object.values(YoutubeMediaType),
     type: SettingOptionType.dropdown,
     value: YoutubeMediaType.video
-  }
+  },
+  status: taskStatusConfig
 });
 
 export = {

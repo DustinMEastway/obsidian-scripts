@@ -3,10 +3,13 @@ import {
   OmdbMediaType,
   OmdbService,
   SettingOptionType,
+  TaskStatusOption,
   createError,
   createSettingOptions,
   createSettingsFromOptions,
-  getClipboard
+  getClipboard,
+  getWebTaskState,
+  taskStatusConfig
 } from '@';
 
 enum ApiUrl {
@@ -17,6 +20,7 @@ interface Settings {
   apiKey: string;
   apiUrl: ApiUrl;
   mediaType: OmdbMediaType;
+  status: TaskStatusOption;
 }
 
 const imdbIdSearch = /^tt\d+$/;
@@ -28,7 +32,8 @@ async function entry(
   const {
     apiKey,
     apiUrl,
-    mediaType
+    mediaType,
+    status
   } = createSettingsFromOptions(
     configOptions,
     options
@@ -63,7 +68,10 @@ async function entry(
     query = choice.imdbId;
   }
 
-  entryApis.variables = await omdbService.getById(query);
+  entryApis.variables = {
+    ...await omdbService.getById(query),
+    ...await getWebTaskState(entryApis, status)
+  };
 }
 
 const options = createSettingOptions<Settings>({
@@ -83,7 +91,8 @@ const options = createSettingOptions<Settings>({
     options: Object.values(OmdbMediaType),
     type: SettingOptionType.dropdown,
     value: OmdbMediaType.movie
-  }
+  },
+  status: taskStatusConfig
 });
 
 export = {

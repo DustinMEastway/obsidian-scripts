@@ -6,15 +6,19 @@ import {
   GoodreadsMediaType,
   GoodreadsService,
   SettingOptionType,
+  TaskStatusOption,
   createError,
   createMarkdownFileName,
   createSettingOptions,
   createSettingsFromOptions,
-  getClipboard
+  getClipboard,
+  getWebTaskState,
+  taskStatusConfig
 } from "@";
 
 interface Settings {
   mediaType: GoodreadsMediaType;
+  status: TaskStatusOption;
 }
 
 async function entry(
@@ -23,7 +27,8 @@ async function entry(
 ) {
   const { quickAddApi } = entryApis;
   const {
-    mediaType
+    mediaType,
+    status
   } = createSettingsFromOptions(
     configOptions,
     options
@@ -55,7 +60,10 @@ async function entry(
 
   entryApis.variables = (item == null) ? item : {
     ...item,
-    fileName: createMarkdownFileName(item.title ?? '')
+    fileName: createMarkdownFileName(item.title ?? ''),
+    ...((mediaType === GoodreadsMediaType.author) ? {} : (
+      await getWebTaskState(entryApis, status)
+    ))
   };
 }
 
@@ -65,7 +73,8 @@ const options = createSettingOptions<Settings>({
     options: Object.values(GoodreadsMediaType),
     type: SettingOptionType.dropdown,
     value: GoodreadsMediaType.book
-  }
+  },
+  status: taskStatusConfig
 });
 
 export = {
