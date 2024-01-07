@@ -4,7 +4,7 @@ import {
   TimeInMs,
   convertTimestamp
 } from '@/number';
-import { createError } from '@/obsidian';
+import { NoteFolder, createError } from '@/obsidian';
 import { youtubeUrl } from './constants';
 import { HttpService } from './http-service';
 import {
@@ -231,7 +231,7 @@ export class YoutubeService {
     return {
       channel: channelTitle,
       channelLink: createMarkdownLink(
-        'Database/YouTubeChannel',
+        NoteFolder.youTubeChannel,
         channelTitle
       ),
       chapters: (chapters) ? `\n\n${chapters}` : '',

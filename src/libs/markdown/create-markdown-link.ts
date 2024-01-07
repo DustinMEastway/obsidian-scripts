@@ -1,11 +1,13 @@
+import { NoteFolder } from '@/obsidian';
+
 export function createMarkdownLink(
-  directory: null | string,
+  folder: null | NoteFolder,
   item: string,
   itemAlias?: string
 ): string {
-  directory = (!directory?.endsWith('/')) ? (
-    `${directory}/`
-  ) : directory;
+  const directory = (!folder?.endsWith('/')) ? (
+    `${folder}/`
+  ) : folder;
 
   return `"[[${directory}${item}|${itemAlias ?? item}]]"`;
 }

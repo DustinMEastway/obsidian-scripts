@@ -1,20 +1,21 @@
-import { createMarkdownLink, formatDate } from '@';
-
-const msInADay = 24 * 60 * 60 * 1000;
+import {
+  NoteFolder,
+  TimeInMs,
+  createMarkdownLink,
+  formatDate
+} from '@';
 
 export = function (
   oldDateString: string,
   shift = 0
 ) {
   const oldDate = new Date(
-    `${oldDateString}`
+    `${oldDateString}T00:00:00`
   );
-  const newDateString = formatDate(
-    oldDate.getTime() + (shift * msInADay)
-  );
+  const newDate = new Date(oldDate.getTime() + (shift * TimeInMs.days));
 
   return createMarkdownLink(
-    'Database/Note/DailyNote',
-    newDateString
+    NoteFolder.dailyNote,
+    formatDate(newDate)
   );
 }

@@ -4,7 +4,7 @@ import {
 } from '@/markdown';
 import { convertRating } from '@/number';
 import { camelCaseObject } from '@/object';
-import { createError } from '@/obsidian';
+import { NoteFolder, createError } from '@/obsidian';
 import { HttpService } from './http-service';
 import {
   OmdbSearchItem,
@@ -94,12 +94,12 @@ export class OmdbService {
 
     return {
       ...item,
-      actorLinks: this._convertArray(actors, 'Database/Character/Nonfiction'),
-      directorLinks: this._convertArray(director, 'Database/Character/Nonfiction'),
+      actorLinks: this._convertArray(actors, NoteFolder.characterNonfiction),
+      directorLinks: this._convertArray(director, NoteFolder.characterNonfiction),
       fileName: createMarkdownFileName(
         this.convertTitle(item)
       ),
-      genreLinks: this._convertArray(genre, 'Core/Meta/Genre'),
+      genreLinks: this._convertArray(genre, NoteFolder.genre),
       imdbRating: this._convertRating(imdbRating),
       plot: (plot) ? `\n\n${plot}` : '',
       type

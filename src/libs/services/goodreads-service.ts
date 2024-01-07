@@ -6,7 +6,7 @@ import {
   createMarkdownLink
 } from '@/markdown';
 import { convertRating } from '@/number';
-import { createError } from '@/obsidian';
+import { NoteFolder, createError } from '@/obsidian';
 import { getAllMatches } from '@/string';
 import { HttpService } from './http-service';
 import {
@@ -76,7 +76,7 @@ export class GoodreadsService {
       description: (description) ? `\n\n${description}` : '',
       seriesLinks: createMarkdownArray(
         series,
-        { linkDirectory: 'Database/BookSeries' }
+        { linkDirectory: NoteFolder.bookSeries }
       ),
       title,
       url
@@ -114,13 +114,13 @@ export class GoodreadsService {
       return genre.genre.name;
     });
     const isFiction = genres.some((genre) => genre === 'Fiction');
-    const charactersDirectory = (
-      `Database/Character/${(isFiction) ? 'Fiction' : 'Nonfiction'}`
-    );
+    const charactersDirectory = (isFiction) ? (
+      NoteFolder.characterFiction
+    ) : NoteFolder.characterNonfiction;
     const seriesLinks = rawBook.bookSeries.map((series) => {
       const { title } = getApolloRef(series.series);
       return createMarkdownLink(
-        'Database/BookSeries',
+        NoteFolder.bookSeries,
         title,
         `${title} (Book ${series.userPosition})`
       );
@@ -134,7 +134,7 @@ export class GoodreadsService {
     return {
       authorLinks: createMarkdownArray(
         authors,
-        { linkDirectory: 'Database/Author' }
+        { linkDirectory: NoteFolder.author }
       ),
       characterLinks: createMarkdownArray(
         characters,
@@ -144,7 +144,7 @@ export class GoodreadsService {
       description: (description) ? `\n\n${description}` : '',
       genreLinks: createMarkdownArray(
         genres,
-        { linkDirectory: 'Core/Meta/Genre' }
+        { linkDirectory: NoteFolder.genre }
       ),
       pageCount: rawBook.details.numPages,
       publishedOn: formatDatetime(work.details.publicationTime),
@@ -189,14 +189,14 @@ export class GoodreadsService {
         bookTitle = removeHtmlTags(bookTitle);
         const bookAlias = `${bookTitle} (${seriesHeaders[index]})`;
 
-        return `## ${bookAlias}\n\n![[Database/Book/${bookTitle}]]`;
+        return `## ${bookAlias}\n\n![[${NoteFolder.book}/${bookTitle}]]`;
       }).join('\n\n');
     }).join('\n\n');
 
     return {
       authorLinks: createMarkdownArray(
         [booksData[0].series[0].book.author.name],
-        { linkDirectory: 'Database/Author' }
+        { linkDirectory: NoteFolder.author }
       ),
       bookCount: numWorks ?? 0,
       books: (books) ? `\n\n${books}` : '',
