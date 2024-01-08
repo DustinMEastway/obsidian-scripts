@@ -36,7 +36,7 @@ async function entry(
 
   const goodreadsService = GoodreadsService.createService();
   const query = await quickAddApi.inputPrompt(
-    'Enter movie title or IMDB ID: ',
+    `Enter Goodreads ${mediaType} URL: `,
     null,
     await getClipboard(quickAddApi)
   );
