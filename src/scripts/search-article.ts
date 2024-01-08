@@ -10,6 +10,7 @@ import {
   getClipboard,
   getHtmlHeaders,
   getHtmlTitle,
+  getJsWeeklyHeaders,
   getWebTaskState,
   taskStatusConfig,
 } from "@";
@@ -42,8 +43,11 @@ async function entry(
     url: query,
     method: HttpRequestMethod.get
   });
+  const headerGetter = (query.includes('javascriptweekly.com')) ? (
+    getJsWeeklyHeaders
+  ) : getHtmlHeaders;
   const headers = createMarkdownHeaders(
-    getHtmlHeaders(response).map((header) => {
+    headerGetter(response).map((header) => {
       header.level += 1;
       return header;
     })

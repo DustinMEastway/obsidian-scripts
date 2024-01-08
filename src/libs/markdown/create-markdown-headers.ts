@@ -6,8 +6,17 @@ import {
 export function createMarkdownHeaders(
   headers: HtmlHeader[]
 ): string {
-  return headers.map(({ content, level }) => {
+  return headers.map(({
+    content,
+    level,
+    url
+  }) => {
     const headerPrefix = '#'.repeat(level);
-    return `\n${headerPrefix} ${removeHtmlTags(content)}`;
+    let header = `\n${headerPrefix} ${removeHtmlTags(content)}`;
+    if (url) {
+      header += `\n\n[Link](${url})`;
+    }
+
+    return header;
   }).join('\n');
 }
