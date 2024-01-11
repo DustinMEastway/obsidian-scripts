@@ -45,7 +45,7 @@ async function entry(
   });
 
   let query = await quickAddApi.inputPrompt(
-    'Enter movie title or IMDB ID: ',
+    'Enter a query or IMDB ID: ',
     null,
     await getClipboard(quickAddApi)
   );
@@ -60,7 +60,7 @@ async function entry(
         options.map((item) => omdbService.convertTitle(item)),
         options
       )
-    )
+    );
     if (!choice) {
       throw createError('No choice selected.');
     }

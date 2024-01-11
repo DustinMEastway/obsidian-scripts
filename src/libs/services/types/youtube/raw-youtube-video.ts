@@ -59,7 +59,8 @@ export type RawYoutubeVideoV2Marker = (
 export type RawYoutubeVideoV2 = {
   playerOverlays: {
     playerOverlayRenderer: {
-      decoratedPlayerBarRenderer: {
+      // This property does not exist when video does not have chapters.
+      decoratedPlayerBarRenderer?: {
         // Yes they have a property with the same name twice.
         decoratedPlayerBarRenderer: {
           playerBar: {

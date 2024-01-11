@@ -212,8 +212,8 @@ export class YoutubeService {
     const url = `${youtubeUrl}/watch?v=${id}`;
     const { localized, publishedAt } = video.snippet;
     const { description } = localized;
-    const { markersMap } = videoData.playerOverlays.playerOverlayRenderer.decoratedPlayerBarRenderer.decoratedPlayerBarRenderer.playerBar.multiMarkersPlayerBarRenderer;
-    const chapters = markersMap.find(({ key }) => {
+    const { markersMap } = videoData.playerOverlays.playerOverlayRenderer.decoratedPlayerBarRenderer?.decoratedPlayerBarRenderer.playerBar.multiMarkersPlayerBarRenderer ?? {};
+    const chapters = markersMap?.find(({ key }) => {
       return (
         key === RawYoutubeVideoV2MarkerKey.autoChapters
         || key === RawYoutubeVideoV2MarkerKey.descriptionChapters

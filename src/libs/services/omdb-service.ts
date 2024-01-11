@@ -108,7 +108,7 @@ export class OmdbService {
 
   private _convertArray(
     itemsString: string,
-    linkDirectory: string
+    linkDirectory: NoteFolder
   ): string {
     return createMarkdownArray(
       (itemsString === 'N/A') ? null : itemsString?.split(','),

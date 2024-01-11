@@ -1,10 +1,12 @@
 {
   "devDependencies": {
-    "esbuild": "^0.19.5"
+    "esbuild": "^0.19.5",
+    "typescript": "^5.3.3"
   },
   "license": "UNLICENSED",
   "scripts": {
     "build": "node build-directory.mjs src/scripts scripts",
-    "build:w": "yarn build --watch"
+    "build:w": "yarn build --watch",
+    "check:types": "npx tsc"
   }
 }

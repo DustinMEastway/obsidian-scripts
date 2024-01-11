@@ -15,6 +15,7 @@ export class HttpService {
     requestConfig: HttpRequest
   ): Promise<string> {
     const {
+      body,
       headers,
       method,
       query,
@@ -28,6 +29,7 @@ export class HttpService {
     }
 
     return await request({
+      body,
       headers,
       method,
       url: urlBuilder.href

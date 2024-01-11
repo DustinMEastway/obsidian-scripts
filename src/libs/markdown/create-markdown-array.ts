@@ -1,8 +1,9 @@
+import { NoteFolder } from '@/obsidian';
 import { createMarkdownLink } from './create-markdown-link';
 
 export type CreateMarkdownArrayConfig = {
   indentation?: number;
-  linkDirectory?: null | string;
+  linkDirectory?: null | NoteFolder;
   prefix?: string;
   suffix?: string;
 }

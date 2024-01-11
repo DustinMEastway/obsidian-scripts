@@ -5,6 +5,7 @@ export type RawOmdbSearchItem = {
   imdbId: string;
   imdbRating: null | number;
   plot: string;
+  poster: string;
   title: string;
   type: string;
   year: string;
