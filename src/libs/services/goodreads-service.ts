@@ -1,8 +1,9 @@
 import { getApolloRefFactory } from '@/apollo';
-import { formatDatetime } from '@/date';
+import { formatDate, formatDatetime } from '@/date';
 import { removeHtmlTags } from '@/html';
 import {
   createMarkdownArray,
+  createMarkdownFileName,
   createMarkdownLink
 } from '@/markdown';
 import { convertRating } from '@/number';
@@ -121,7 +122,7 @@ export class GoodreadsService {
       const { title } = getApolloRef(series.series);
       return createMarkdownLink(
         NoteFolder.bookSeries,
-        title,
+        createMarkdownFileName(title),
         `${title} (Book ${series.userPosition})`
       );
     });
@@ -147,7 +148,11 @@ export class GoodreadsService {
         { linkDirectory: NoteFolder.genre }
       ),
       pageCount: rawBook.details.numPages,
-      publishedOn: formatDatetime(work.details.publicationTime),
+      publishedOn: createMarkdownLink(
+        NoteFolder.dailyNote,
+        formatDate(work.details.publicationTime),
+        formatDatetime(work.details.publicationTime)
+      ),
       ratingsGoodreads: this._convertRating(work.stats.averageRating),
       seriesLinks: createMarkdownArray(
         seriesLinks

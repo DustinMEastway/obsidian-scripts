@@ -7,7 +7,7 @@ export type IgdbGame = {
   fileName: string;
   genreLinks: string;
   publisherLinks: string;
-  ratingsIgdb: number;
+  ratingsIgdb: number | 'null';
   releaseDate: string;
   remakeLinks: string;
   remasterLinks: string;

@@ -1,7 +1,8 @@
 import { formatDate } from '@/date';
 import {
   createMarkdownArray,
-  createMarkdownFileName
+  createMarkdownFileName,
+  createMarkdownLink
 } from '@/markdown';
 import { NoteFolder } from '@/obsidian';
 import { camelCaseObject } from '@/object';
@@ -159,7 +160,7 @@ export class IgdbService {
       cover: `https:${cover}`.replace('t_thumb', 't_cover_big'),
       description: (description) ? `\n\n${description}` : '',
       developerLinks: createNameArray(
-        involvedCompanies.filter(({ developer }) => {
+        involvedCompanies?.filter(({ developer }) => {
           return developer;
         }).map(({ company }) => {
           return company;
@@ -175,15 +176,18 @@ export class IgdbService {
         NoteFolder.genre
       ),
       publisherLinks: createNameArray(
-        involvedCompanies.filter(({ publisher }) => {
+        involvedCompanies?.filter(({ publisher }) => {
           return publisher;
         }).map(({ company }) => {
           return company;
         }),
         NoteFolder.company
       ),
-      ratingsIgdb: Math.round(totalRating),
-      releaseDate: formatDate(this._convertDate(firstReleaseDate)),
+      ratingsIgdb: (totalRating) ? Math.round(totalRating) : 'null',
+      releaseDate: createMarkdownLink(
+        NoteFolder.dailyNote,
+        formatDate(this._convertDate(firstReleaseDate))
+      ),
       remakeLinks: createGameArray(remakes),
       remasterLinks: createGameArray(remasters),
       seriesLinks: createNameArray(

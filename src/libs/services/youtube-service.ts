@@ -1,4 +1,4 @@
-import { formatDatetime } from '@/date';
+import { formatDate, formatDatetime } from '@/date';
 import { createMarkdownLink } from '@/markdown';
 import {
   TimeInMs,
@@ -237,7 +237,11 @@ export class YoutubeService {
       chapters: (chapters) ? `\n\n${chapters}` : '',
       description: (description) ? `\n\n${description}` : '',
       id,
-      publishedOn: formatDatetime(publishedAt),
+      publishedOn: createMarkdownLink(
+        NoteFolder.dailyNote,
+        formatDate(publishedAt),
+        formatDatetime(publishedAt)
+      ),
       thumbnail: highThumbnail ?? defaultThumbnail,
       title,
       url

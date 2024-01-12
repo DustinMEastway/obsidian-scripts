@@ -41,6 +41,6 @@ export type RawIgdbGame = {
     id: number;
     name: string;
   }[];
-  totalRating: number;
+  totalRating?: number;
   url: string;
 }
