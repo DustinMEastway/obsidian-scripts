@@ -5,7 +5,7 @@
   },
   "license": "UNLICENSED",
   "scripts": {
-    "build": "node build-directory.mjs src/scripts scripts",
+    "build": "node build-directory.mjs src/scripts build",
     "build:w": "yarn build --watch",
     "check:types": "npx tsc"
   }

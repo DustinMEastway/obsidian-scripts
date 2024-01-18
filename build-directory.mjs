@@ -1,14 +1,13 @@
+import { context } from 'esbuild';
 import {
-  build,
-  context
-} from 'esbuild';
-import {
+  mkdir as makeDirectory,
   readdir as readDirectory,
   readFile,
   stat,
   writeFile
 } from 'fs/promises';
 import {
+  dirname as directoryName,
   join as joinPath,
   resolve as resolvePath
 } from 'path';
@@ -25,7 +24,7 @@ if (destination.includes(',') || notesSyncPath) {
   }).map((path) => {
     return resolvePath(path);
   });
-  destination = extraDestinations.pop();
+  destination = extraDestinations.shift();
 }
 
 destination = resolvePath(destination);
@@ -66,34 +65,40 @@ await Promise.all(files.map(async (file) => {
     outfile: destinationFile
   };
 
-  if (watch) {
-    const ctx = await context({
-      ...config,
-      plugins: [
-        {
-          name: 'extra-destinations-copy',
-          setup: (build) => {
-            build.onEnd(async () => {
-              if (!extraDestinations.length) {
-                return;
-              }
+  const copyToExtraDestinations = async () => {
+    if (!extraDestinations.length) {
+      return;
+    }
 
-              const content = await readFile(destinationFile);
-              await Promise.all(
-                extraDestinations.map(async (extraDestination) => {
-                  await writeFile(
-                    destinationFile.replace(destination, extraDestination),
-                    content
-                  );
-                })
-              );
-            });
-          }
+    const content = await readFile(destinationFile);
+    await Promise.all(
+      extraDestinations.map(async (extraDestination) => {
+        const filePath = destinationFile.replace(destination, extraDestination);
+        const fileDirectory = directoryName(filePath);
+        await makeDirectory(fileDirectory, { recursive: true });
+        await writeFile(filePath, content);
+      })
+    );
+  };
+
+  const ctx = await context({
+    ...config,
+    plugins: [
+      {
+        name: 'extra-destinations-copy',
+        setup: (build) => {
+          build.onEnd(copyToExtraDestinations);
         }
-      ]
-    });
+      }
+    ]
+  });
+  if (watch) {
     await ctx.watch();
   } else {
-    await build(config);
+    await ctx.rebuild(config);
   }
 }));
+
+if (!watch) {
+  process.exit();
+}
