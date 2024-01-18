@@ -23,7 +23,7 @@ interface Settings {
   status: TaskStatusOption;
 }
 
-const imdbIdSearch = /^tt\d+$/;
+const imdbIdSearch = /.*\b(tt\d+)\b.*/;
 async function entry(
   entryApis: EntryApis,
   configOptions: Record<string, Settings[keyof(Settings)]>
@@ -53,7 +53,9 @@ async function entry(
       throw createError('No query entered.');
   }
 
-  if (!imdbIdSearch.test(query)) {
+  if (imdbIdSearch.test(query)) {
+    query = query.replace(imdbIdSearch, '$1');
+  } else {
     const options = await omdbService.getByQuery(query, mediaType);
     const choice = (options.length === 1) ? options[0] : (
       await quickAddApi.suggester(
