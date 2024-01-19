@@ -1,5 +1,8 @@
 import {
   EntryApis,
+  IgdbGameSeries,
+  IgdbMediaType,
+  IgdbSearchGame,
   SettingOptionType,
   TaskStatusOption,
   createError,
@@ -14,6 +17,7 @@ import { IgdbService } from '@/services/igdb-service';
 interface Settings {
   clientId: string;
   clientSecret: string;
+  mediaType: IgdbMediaType;
   status: TaskStatusOption;
 }
 
@@ -25,6 +29,7 @@ async function entry(
   const {
     clientId,
     clientSecret,
+    mediaType,
     status
   } = createSettingsFromOptions(
     configOptions,
@@ -37,7 +42,7 @@ async function entry(
   });
 
   const query = await quickAddApi.inputPrompt(
-    'Enter a query',
+    `Enter a ${mediaType} query`,
     null,
     await getClipboard(quickAddApi)
   );
@@ -45,19 +50,30 @@ async function entry(
       throw createError('No query entered.');
   }
 
-  const games = await igdbService.searchGames(query);
-  const choice = (games.length === 1) ? games[0] : (
-    await quickAddApi.suggester(
-      games.map((item) => item.fileName),
-      games
+  const items = (mediaType === IgdbMediaType.game) ? (
+    await igdbService.searchGames(query)
+  ) : (
+    await igdbService.searchGameSeries(query)
+  );
+
+  const choice = (items.length === 1) ? items[0] : (
+    await quickAddApi.suggester<IgdbSearchGame | IgdbGameSeries>(
+      items.map((item) => item.fileName),
+      items
     )
   );
   if (!choice) {
     throw createError('No choice selected.');
   }
 
+  const item = ('gameLinks' in choice) ? (
+    choice
+  ) : (
+    await igdbService.getGame(choice.id)
+  );
+
   entryApis.variables = {
-    ...await igdbService.getGame(choice.id),
+    ...item,
     ...await getWebTaskState(entryApis, status)
   };
 }
@@ -72,6 +88,12 @@ const options = createSettingOptions<Settings>({
     label: 'Twitch Client Secret',
     type: SettingOptionType.text,
     value: ''
+  },
+  mediaType: {
+    label: 'Media Type',
+    options: Object.values(IgdbMediaType),
+    type: SettingOptionType.dropdown,
+    value: IgdbMediaType.game
   },
   status: taskStatusConfig
 });

@@ -11,8 +11,10 @@ import { TwitchService, TwitchServiceConfig } from './twitch-service';
 import {
   HttpRequestMethod,
   IgdbGame,
+  IgdbGameSeries,
   IgdbSearchGame,
   RawIgdbGame,
+  RawIgdbGameSeries,
   RawIgdbSearchGame
 } from './types';
 
@@ -82,6 +84,25 @@ export class IgdbService {
     return this._convertGame(games[0]);
   }
 
+  async searchGameSeries(query: string): Promise<IgdbGameSeries[]> {
+    return camelCaseObject<RawIgdbGameSeries[]>(
+      await this._httpService.fetchJson({
+        body: `
+          fields
+            games.id,
+            games.first_release_date,
+            games.name,
+            name,
+            url
+          ;
+          where name ~ *"${query}"*;
+        `,
+        method: HttpRequestMethod.post,
+        url: 'franchises'
+      })
+    ).map((gameSeries) => this._convertGameSeries(gameSeries));
+  }
+
   async searchGames(query: string): Promise<IgdbSearchGame[]> {
     return camelCaseObject<RawIgdbSearchGame[]>(
       await this._httpService.fetchJson({
@@ -132,7 +153,7 @@ export class IgdbService {
     ): string => {
       return createMarkdownArray(
         items?.map(({ name }) => {
-          return name;
+          return createMarkdownFileName(name);
         }),
         { linkDirectory }
       );
@@ -194,6 +215,27 @@ export class IgdbService {
       typeLinks: createNameArray(
         genres,
         NoteFolder.videoGameType
+      ),
+      url
+    }
+  }
+
+  private _convertGameSeries(
+    gameSeries: RawIgdbGameSeries
+  ): IgdbGameSeries {
+    const {
+      games,
+      name,
+      url
+    } = gameSeries;
+
+    return {
+      fileName: createMarkdownFileName(name),
+      gameLinks: (!games?.length) ? '' : (
+        '\n\n' + games.map((game) => {
+          const { fileName } = this._convertSearchGame(game);
+          return `## ${fileName}\n\n![[${NoteFolder.videoGame}/${fileName}]]`;
+        }).join('\n\n')
       ),
       url
     }
