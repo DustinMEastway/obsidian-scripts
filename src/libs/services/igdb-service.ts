@@ -1,11 +1,11 @@
-import { formatDate } from '@/date';
 import {
+  createDateLink,
   createMarkdownArray,
-  createMarkdownFileName,
-  createMarkdownLink
+  createMarkdownFileName
 } from '@/markdown';
-import { NoteFolder } from '@/obsidian';
+import { TimeInMs } from '@/number';
 import { camelCaseObject } from '@/object';
+import { NoteFolder } from '@/obsidian';
 import { HttpService } from './http-service';
 import { TwitchService, TwitchServiceConfig } from './twitch-service';
 import {
@@ -15,7 +15,6 @@ import {
   RawIgdbGame,
   RawIgdbSearchGame
 } from './types';
-import { TimeInMs } from '@/number';
 
 export class IgdbService {
   constructor(
@@ -184,10 +183,7 @@ export class IgdbService {
         NoteFolder.company
       ),
       ratingsIgdb: (totalRating) ? Math.round(totalRating) : 'null',
-      releaseDate: createMarkdownLink(
-        NoteFolder.dailyNote,
-        formatDate(this._convertDate(firstReleaseDate))
-      ),
+      releaseDate: createDateLink(this._convertDate(firstReleaseDate)),
       remakeLinks: createGameArray(remakes),
       remasterLinks: createGameArray(remasters),
       seriesLinks: createNameArray(

@@ -1,5 +1,5 @@
-import { formatDate, formatDatetime } from '@/date';
-import { createMarkdownLink } from '@/markdown';
+import { DateFormat } from '@/date';
+import { createDateLink, createMarkdownLink } from '@/markdown';
 import {
   TimeInMs,
   convertTimestamp
@@ -237,10 +237,9 @@ export class YoutubeService {
       chapters: (chapters) ? `\n\n${chapters}` : '',
       description: (description) ? `\n\n${description}` : '',
       id,
-      publishedOn: createMarkdownLink(
-        NoteFolder.dailyNote,
-        formatDate(publishedAt),
-        formatDatetime(publishedAt)
+      publishedOn: createDateLink(
+        publishedAt,
+        { format: DateFormat.datetime }
       ),
       thumbnail: highThumbnail ?? defaultThumbnail,
       title,

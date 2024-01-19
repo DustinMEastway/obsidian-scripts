@@ -1,7 +1,8 @@
 import { getApolloRefFactory } from '@/apollo';
-import { formatDate, formatDatetime } from '@/date';
+import { DateFormat } from '@/date';
 import { removeHtmlTags } from '@/html';
 import {
+  createDateLink,
   createMarkdownArray,
   createMarkdownFileName,
   createMarkdownLink
@@ -148,10 +149,9 @@ export class GoodreadsService {
         { linkDirectory: NoteFolder.genre }
       ),
       pageCount: rawBook.details.numPages,
-      publishedOn: createMarkdownLink(
-        NoteFolder.dailyNote,
-        formatDate(work.details.publicationTime),
-        formatDatetime(work.details.publicationTime)
+      publishedOn: createDateLink(
+        work.details.publicationTime,
+        { format: DateFormat.datetime }
       ),
       ratingsGoodreads: this._convertRating(work.stats.averageRating),
       seriesLinks: createMarkdownArray(

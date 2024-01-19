@@ -1,5 +1,4 @@
-import { formatDate } from '@/date';
-import { createMarkdownLink } from '@/markdown';
+import { createDateLink, createMarkdownLink } from '@/markdown';
 import { NoteFolder, TaskStatus } from './constants';
 import { EntryApis, SettingOptionType } from './types';
 
@@ -37,9 +36,7 @@ export async function getWebTaskState(
     status: createMarkdownLink(NoteFolder.statusBasic, status)
   };
 
-  const today = createMarkdownLink(
-    NoteFolder.dailyNote, formatDate(Date.now())
-  );
+  const today = createDateLink(Date.now());
   if (status === TaskStatus.done) {
     taskState.finishedOn = today;
     taskState.startedOn = today;
