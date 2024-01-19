@@ -10,5 +10,6 @@ export type OmdbSearchItem = Omit<RawOmdbSearchItem, OmittedRawKeys> & {
   directorLinks: string;
   fileName: string;
   genreLinks: string;
+  publishedOn: string;
   type: OmdbMediaType;
 };

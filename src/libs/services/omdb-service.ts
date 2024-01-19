@@ -1,4 +1,5 @@
 import {
+  createDateLink,
   createMarkdownArray,
   createMarkdownFileName
 } from '@/markdown';
@@ -88,7 +89,8 @@ export class OmdbService {
       director,
       genre,
       imdbRating,
-      plot
+      plot,
+      released
     } = item;
     const type = this._convertType(item.type);
 
@@ -102,6 +104,7 @@ export class OmdbService {
       genreLinks: this._convertArray(genre, NoteFolder.genre),
       imdbRating: this._convertRating(imdbRating),
       plot: (plot) ? `\n\n${plot}` : '',
+      publishedOn: createDateLink(released),
       type
     };
   }
