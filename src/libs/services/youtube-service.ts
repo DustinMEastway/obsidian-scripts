@@ -235,7 +235,10 @@ export class YoutubeService {
         channelTitle
       ),
       chapters: (chapters) ? `\n\n${chapters}` : '',
-      description: (description) ? `\n\n${description}` : '',
+      description: (description) ? (
+        // Escape tags to keep them from mixing in with Obsidian tags.
+        `\n\n${description}`.replace(/(\s+)(#\w+\b)/g, '$1\\$2')
+      ) : '',
       id,
       publishedOn: createDateLink(
         publishedAt,
