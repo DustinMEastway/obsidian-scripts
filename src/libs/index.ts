@@ -6,3 +6,4 @@ export * from './object';
 export * from './obsidian';
 export * from './services';
 export * from './string';
+export * from './types';

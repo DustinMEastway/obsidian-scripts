@@ -1,4 +1,5 @@
 export * from './entry-apis';
+export * from './notes';
 export * from './setting-option';
 export * from './setting-option-config';
 export * from './setting-option-type';
