@@ -6,9 +6,7 @@ export type BookNote = (
   & {
     cover: string;
     next: ObsidianPageLink;
-    priority: ObsidianPageLink;
     prior: ObsidianPageLink;
     ratingsGoodreads: number;
-    status: ObsidianPageLink;
   }
 );

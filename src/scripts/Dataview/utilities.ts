@@ -1,5 +1,9 @@
-import { getTable } from '@/dataview';
+import {
+  getTable,
+  getTaskTable
+} from '@/dataview';
 
 export {
-  getTable
+  getTable,
+  getTaskTable
 };

@@ -1,15 +1,7 @@
 /** Globally defined Obsidian items. */
-import {
-  DataviewApi,
-  HttpRequestMethod,
-  ObsidianApi
-} from '@';
+import { HttpRequestMethod } from '@';
 
 declare global {
-  const app: ObsidianApi;
-
-  const dv: DataviewApi;
-
   class Notice {
     constructor(
       message: string,

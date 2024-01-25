@@ -4,6 +4,10 @@ import { ObsidianPage } from './obsidian-page';
 export type ObsidianApi = {
   plugins: {
     plugins: {
+      dataview: {
+        /** @warning Using @see DataviewApi.table off from here does not work. */
+        api: DataviewApi;
+      };
       ['metadata-menu']: {
         api: {
           fieldModifier: <T>(
