@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@types/node": "^20.11.9",
     "esbuild": "^0.19.5",
     "typescript": "^5.3.3"
   },

@@ -9,19 +9,6 @@ declare global {
     );
   }
 
-  class URL {
-    href: string;
-
-    constructor(path: string);
-
-    searchParams: {
-      append(
-        key: string,
-        value: number | string
-      ): void;
-    };
-  }
-
   function request(
     config: {
       body?: string;

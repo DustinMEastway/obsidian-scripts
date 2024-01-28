@@ -1,3 +1,6 @@
 .DS_Store
 /build
 /node_modules
+
+# Sandbox
+/src/scripts/sandbox.ts

@@ -22,18 +22,15 @@ export class HttpService {
       url
     } = await this._adaptRequest(requestConfig);
     const urlBuilder = new URL(url);
-    if (query) {
-      Object.entries(query).forEach(([key, value]) => {
-        urlBuilder.searchParams.append(key, value);
-      });
-    }
+    Object.entries(query ?? {}).forEach(([key, value]) => {
+      urlBuilder.searchParams.append(key, `${value}`);
+    });
 
-    return await request({
+    return (await fetch(urlBuilder.href, {
       body,
       headers,
-      method,
-      url: urlBuilder.href
-    });
+      method
+    })).text();
   }
 
   async fetchJson<T>(
