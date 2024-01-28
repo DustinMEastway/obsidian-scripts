@@ -10,6 +10,6 @@ export function createDateLink(
   return createMarkdownLink(
     NoteFolder.dailyNote,
     formatDate(date),
-    formatDate(date, config)
+    { alias: formatDate(date, config) }
   );
 }

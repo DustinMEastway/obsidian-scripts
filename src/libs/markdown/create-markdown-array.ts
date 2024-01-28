@@ -4,6 +4,8 @@ import { createMarkdownLink } from './create-markdown-link';
 export type CreateMarkdownArrayConfig = {
   indentation?: number;
   linkDirectory?: null | NoteFolder;
+  /** If using @see linkDirectory, then make a YMAL link @default true. */
+  linkInYaml?: boolean;
   prefix?: string;
   suffix?: string;
 }
@@ -13,6 +15,7 @@ export function createMarkdownArray(
   {
     indentation = 1,
     linkDirectory = null,
+    linkInYaml = true,
     prefix = '',
     suffix = ''
   }: CreateMarkdownArrayConfig = {}
@@ -25,7 +28,9 @@ export function createMarkdownArray(
   return items.map((item) => {
     item = item.trim();
     if (linkDirectory != null) {
-      item = createMarkdownLink(linkDirectory, item);
+      item = createMarkdownLink(linkDirectory, item, {
+        inYaml: linkInYaml
+      });
     }
 
     return `\n${spaces}- ${prefix}${item}${suffix}`;

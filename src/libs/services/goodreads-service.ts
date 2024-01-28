@@ -124,7 +124,7 @@ export class GoodreadsService {
       return createMarkdownLink(
         NoteFolder.bookSeries,
         createMarkdownFileName(title),
-        `${title} (Book ${series.userPosition})`
+        { alias: `${title} (Book ${series.userPosition})` }
       );
     });
     const work = getApolloRef(rawBook.work);
