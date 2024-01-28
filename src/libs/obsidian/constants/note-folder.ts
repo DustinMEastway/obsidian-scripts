@@ -8,6 +8,7 @@ export enum NoteFolder {
   dailyNote = 'Database/Note/DailyNote',
   genre = 'Core/Meta/Genre',
   statusBasic = 'Core/Meta/Status/Basic',
+  term = 'Database/Term',
   videoGame = 'Database/VideoGame',
   videoGameEngine = 'Core/VideoGameEngine',
   videoGameConsole = 'Core/VideoGameConsole',

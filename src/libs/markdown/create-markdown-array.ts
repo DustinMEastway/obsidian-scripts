@@ -2,10 +2,11 @@ import { NoteFolder } from '@/obsidian';
 import { createMarkdownLink } from './create-markdown-link';
 
 export type CreateMarkdownArrayConfig = {
+  /** Whether this array is in YAML or not @default true. */
+  inYaml?: boolean;
+  /** Number of tabs (two spaces) to use @default 1 if @see inYaml otherwise 0. */
   indentation?: number;
   linkDirectory?: null | NoteFolder;
-  /** If using @see linkDirectory, then make a YMAL link @default true. */
-  linkInYaml?: boolean;
   prefix?: string;
   suffix?: string;
 }
@@ -13,23 +14,23 @@ export type CreateMarkdownArrayConfig = {
 export function createMarkdownArray(
   items: string[] | null | undefined,
   {
-    indentation = 1,
+    inYaml = true,
+    indentation,
     linkDirectory = null,
-    linkInYaml = true,
     prefix = '',
     suffix = ''
   }: CreateMarkdownArrayConfig = {}
 ): string {
   if (!items?.length) {
-    return 'null';
+    return (inYaml) ? 'null' : '';
   }
 
-  const spaces = '  '.repeat(indentation);
+  const spaces = '  '.repeat(indentation ?? ((inYaml) ? 1 : 0));
   return items.map((item) => {
     item = item.trim();
     if (linkDirectory != null) {
       item = createMarkdownLink(linkDirectory, item, {
-        inYaml: linkInYaml
+        inYaml
       });
     }
 

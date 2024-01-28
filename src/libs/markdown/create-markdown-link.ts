@@ -4,7 +4,7 @@ import { createMarkdownFileName } from './create-markdown-file-name';
 export type CreateMarkdownLinkConfig = {
   /** Alias of the link @default @see item. */
   alias?: string;
-  /** Add quotes to links in Yaml @default true */
+  /** Add quotes to links in YAML @default true */
   inYaml?: boolean;
 }
 

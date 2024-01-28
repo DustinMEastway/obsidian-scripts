@@ -3,6 +3,7 @@ import {
   IgdbGameSeries,
   IgdbMediaType,
   IgdbSearchGame,
+  IgdbService,
   SettingOptionType,
   TaskStatusOption,
   createError,
@@ -12,7 +13,6 @@ import {
   getWebTaskState,
   taskStatusConfig
 } from '@';
-import { IgdbService } from '@/services/igdb-service';
 
 interface Settings {
   clientId: string;

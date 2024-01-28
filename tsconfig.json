@@ -12,6 +12,7 @@
       "@/*": ["src/libs/*"]
     },
     "rootDir": ".",
-    "strict": true
+    "strict": true,
+    "target": "es2015"
   }
 }
