@@ -26,11 +26,20 @@ export class HttpService {
       urlBuilder.searchParams.append(key, `${value}`);
     });
 
-    return (await fetch(urlBuilder.href, {
+    // Node Fetch for testing.
+    // return (await fetch(urlBuilder.href, {
+    //   body,
+    //   headers,
+    //   method
+    // })).text();
+
+    // Obsidian fetch for production use.
+    return request({
       body,
       headers,
-      method
-    })).text();
+      method,
+      url: urlBuilder.href
+    });
   }
 
   async fetchJson<T>(
