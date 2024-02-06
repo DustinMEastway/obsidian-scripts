@@ -5,7 +5,9 @@ const characterMap = new Map([
   [/&#822[01];/g, '"'],
   [/&gt;/g, '\\>'],
   [/&lt;/g, '\\<'],
-  [/​|&nbsp;/g, ' ']
+  [/​|&nbsp;/g, ' '],
+  // Escape pound signs.
+  [/(\s+)(#\w+\b)/g, '$1\\$2']
 ]);
 
 export function removeHtmlTags(html: string): string {

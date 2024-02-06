@@ -70,32 +70,36 @@ export class TermService {
 
   async getDefinition(term: string): Promise<DefinitionResponse | null> {
     const response: DefinitionResponse = {};
-    switch (this._definitionApi) {
-      case DefinitionApi.freeDictionary:
-        const definitionSources = await this._definitionService.fetchJson<
-          RawFreeDictionaryResponse
-        >({
-          url: term
-        });
+    try {
+      switch (this._definitionApi) {
+        case DefinitionApi.freeDictionary:
+          const definitionSources = await this._definitionService.fetchJson<
+            RawFreeDictionaryResponse
+          >({
+            url: term
+          });
 
-        if (!(definitionSources instanceof Array)) {
-          return null;
-        }
+          if (!(definitionSources instanceof Array)) {
+            return null;
+          }
 
-        definitionSources.forEach((definitionSource) => {
-          definitionSource.meanings.forEach((meaning) => {
-            response[meaning.partOfSpeech] = [
-              ...response[meaning.partOfSpeech] ?? [],
-              ...meaning.definitions.map(({ definition }) => {
-                return definition;
-              })
-            ];
-          })
-        });
-        break;
-      default:
-        const neverApi: never = this._definitionApi;
-        throw new Error(`Definition API '${neverApi}' not implemented.`);
+          definitionSources.forEach((definitionSource) => {
+            definitionSource.meanings.forEach((meaning) => {
+              response[meaning.partOfSpeech] = [
+                ...response[meaning.partOfSpeech] ?? [],
+                ...meaning.definitions.map(({ definition }) => {
+                  return definition;
+                })
+              ];
+            })
+          });
+          break;
+        default:
+          const neverApi: never = this._definitionApi;
+          throw new Error(`Definition API '${neverApi}' not implemented.`);
+      }
+    } catch {
+      // Intentionally left blank.
     }
 
     return response;
@@ -177,45 +181,49 @@ export class TermService {
 
   async getThesaurus(term: string): Promise<ThesaurusResponse | null> {
     const response: ThesaurusResponse = {};
-    switch (this._thesaurusApi) {
-      case ThesaurusApi.freeDictionary:
-        const thesaurusSources = await this._thesaurusService.fetchJson<
-          RawFreeDictionaryResponse
-        >({
-          url: term
-        });
+    try {
+      switch (this._thesaurusApi) {
+        case ThesaurusApi.freeDictionary:
+          const thesaurusSources = await this._thesaurusService.fetchJson<
+            RawFreeDictionaryResponse
+          >({
+            url: term
+          });
 
-        if (!(thesaurusSources instanceof Array)) {
-          return null;
-        }
+          if (!(thesaurusSources instanceof Array)) {
+            return null;
+          }
 
-        thesaurusSources.forEach((thesaurusSource) => {
-          thesaurusSource.meanings.forEach((meaning) => {
-            response[meaning.partOfSpeech] ??= {
-              antonyms: [],
-              synonyms: []
-            };
-            const part = response[meaning.partOfSpeech];
-            part.antonyms = [
-              ...part.antonyms,
-              ...meaning.antonyms,
-              ...meaning.definitions.map(({ antonyms }) => {
-                return antonyms;
-              }).flat()
-            ];
-            part.synonyms = [
-              ...part.synonyms,
-              ...meaning.synonyms,
-              ...meaning.definitions.map(({ synonyms }) => {
-                return synonyms;
-              }).flat()
-            ];
-          })
-        });
-        break;
-      default:
-        const neverApi: never = this._thesaurusApi;
-        throw new Error(`Definition API '${neverApi}' not implemented.`);
+          thesaurusSources.forEach((thesaurusSource) => {
+            thesaurusSource.meanings.forEach((meaning) => {
+              response[meaning.partOfSpeech] ??= {
+                antonyms: [],
+                synonyms: []
+              };
+              const part = response[meaning.partOfSpeech];
+              part.antonyms = [
+                ...part.antonyms,
+                ...meaning.antonyms,
+                ...meaning.definitions.map(({ antonyms }) => {
+                  return antonyms;
+                }).flat()
+              ];
+              part.synonyms = [
+                ...part.synonyms,
+                ...meaning.synonyms,
+                ...meaning.definitions.map(({ synonyms }) => {
+                  return synonyms;
+                }).flat()
+              ];
+            })
+          });
+          break;
+        default:
+          const neverApi: never = this._thesaurusApi;
+          throw new Error(`Definition API '${neverApi}' not implemented.`);
+      }
+    } catch {
+      // Intentionally left blank.
     }
 
     return response;

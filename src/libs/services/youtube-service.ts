@@ -20,6 +20,7 @@ import {
   YoutubeSearchItem,
   YoutubeVideo
 } from './types';
+import { removeHtmlTags } from '@/html';
 
 const rawDataSearch = /ytInitialData\s*=\s*({[\s\S]+?});\s*<\/script>/;
 const mediaTypeBackMap = new Map([
@@ -149,7 +150,7 @@ export class YoutubeService {
 
     return {
       banner: bannerExternalUrl,
-      description,
+      description: removeHtmlTags(description),
       id,
       url: `${youtubeUrl}/${customUrl}`,
       thumbnail: highThumbnail ?? defaultThumbnail,
@@ -237,7 +238,7 @@ export class YoutubeService {
       chapters: (chapters) ? `\n\n${chapters}` : '',
       description: (description) ? (
         // Escape tags to keep them from mixing in with Obsidian tags.
-        `\n\n${description}`.replace(/(\s+)(#\w+\b)/g, '$1\\$2')
+        `\n\n${removeHtmlTags(description)}`
       ) : '',
       id,
       publishedOn: createDateLink(
