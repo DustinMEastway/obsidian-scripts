@@ -5,7 +5,7 @@ export enum NoteFolder {
   characterFiction = 'Database/Character/Fiction',
   characterNonfiction = 'Database/Character/Nonfiction',
   company = 'Core/Meta/Company',
-  dailyNote = 'Database/Note/DailyNote',
+  dailyNote = 'Database/DailyNote',
   genre = 'Core/Meta/Genre',
   statusBasic = 'Core/Meta/Status/Basic',
   term = 'Database/Term',
