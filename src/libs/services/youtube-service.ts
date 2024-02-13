@@ -150,7 +150,7 @@ export class YoutubeService {
 
     return {
       banner: bannerExternalUrl,
-      description: removeHtmlTags(description),
+      description: (description) ? `\n\n${removeHtmlTags(description)}` : '',
       id,
       url: `${youtubeUrl}/${customUrl}`,
       thumbnail: highThumbnail ?? defaultThumbnail,
