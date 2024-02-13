@@ -198,8 +198,12 @@ function getFilter<T extends TaskNote>(
       };
     case GetTaskTableFilterType.top:
       return (page) => {
-        return (internalRating) ? page[internalRating] != null : (
-          page.status.display === 'Done'
+        return (
+          (
+            internalRating
+            && page[internalRating] != null
+          )
+          || page.status.display === 'Done'
         );
       };
     default: {
