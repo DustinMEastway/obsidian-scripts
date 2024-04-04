@@ -1,6 +1,6 @@
 import {
   DataviewApi,
-  DataviewQuerier,
+  DataArray,
   DataviewSortOrder
 } from '@/types';
 import { DataviewSortConfig, DataviewValueGetter } from './types';
@@ -8,7 +8,7 @@ import { DataviewSortConfig, DataviewValueGetter } from './types';
 export type QueryNotesConfig<T> = {
   limit?: number;
   sort?: DataviewSortConfig<T>[];
-  source: DataviewQuerier<T> | string;
+  source: DataArray<T> | string;
   where?: DataviewValueGetter<T, boolean>;
 };
 
@@ -20,7 +20,7 @@ export function queryNotes<T>(
     source,
     where
   }: QueryNotesConfig<T>
-): DataviewQuerier<T> {
+): DataArray<T> {
   let pages = (typeof source === 'string') ? (
     dataviewApi.pages<T>(source)
   ) : source;
