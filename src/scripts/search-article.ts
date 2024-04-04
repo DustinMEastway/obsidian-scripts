@@ -12,12 +12,24 @@ import {
   getHtmlTitle,
   getJsWeeklyHeaders,
   getWebTaskState,
+  getWikipediaHeaders,
   taskStatusConfig,
 } from "@";
 
 type Settings = {
   status: TaskStatusOption;
 }
+
+const headerGetters = [
+  {
+    search: /\bjavascriptweekly\.com\b/,
+    getter: getJsWeeklyHeaders
+  },
+  {
+    search: /\bwikipedia\.org\b/,
+    getter: getWikipediaHeaders
+  }
+];
 
 async function entry(
   entryApis: EntryApis,
@@ -43,9 +55,9 @@ async function entry(
     url: query,
     method: HttpRequestMethod.get
   });
-  const headerGetter = (query.includes('javascriptweekly.com')) ? (
-    getJsWeeklyHeaders
-  ) : getHtmlHeaders;
+  const headerGetter = headerGetters.find(({ search }) => {
+    return search.test(query);
+  })?.getter ?? getHtmlHeaders;
   const headers = createMarkdownHeaders(
     headerGetter(response).map((header) => {
       header.level += 1;

@@ -194,7 +194,7 @@ export class GoodreadsService {
         bookTitle = removeHtmlTags(bookTitle);
         const bookAlias = `${bookTitle} (${seriesHeaders[index]})`;
 
-        return `## ${bookAlias}\n\n![[${NoteFolder.book}/${bookTitle}]]`;
+        return `## ${bookAlias}\n\n![[${NoteFolder.book}/${bookTitle}#Description]]`;
       }).join('\n\n');
     }).join('\n\n');
 
