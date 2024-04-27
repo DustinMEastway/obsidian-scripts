@@ -3,6 +3,8 @@ import { ObsidianPageLink } from '../obsidian-page-link';
 import { DataArray } from './data-array';
 
 export type DataviewApi = {
+  current<T>(): ObsidianPage<T>;
+
   page<T>(
     query: string | ObsidianPageLink
   ): ObsidianPage<T>;

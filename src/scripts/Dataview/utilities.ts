@@ -4,6 +4,8 @@ import {
 } from '@/dataview';
 
 export {
+  /** @deprecated Use `dv.view` instead. */
   getTable,
+  /** @deprecated Use `dv.view` instead. */
   getTaskTable
 };

@@ -1,4 +1,9 @@
-import { BaseTaskNote, MetadataNote } from '@/obsidian';
+import {
+  BaseTaskNote,
+  GetTaskTableConfig,
+  GetTaskTableFilterType,
+  MetadataNote
+} from '@/obsidian';
 import { StringCase, convertCase } from '@/string';
 import { ObsidianPage, ObsidianPageLink } from '@/types';
 import { getTable } from './get-table';
@@ -8,30 +13,6 @@ import {
   DataviewColumnConfig,
   GroupedApis
 } from './types';
-
-export enum GetTaskTableFilterType {
-  abandoned = 'Abandoned',
-  toDo = 'To Do',
-  top = 'Top'
-}
-
-export type GetTaskTableConfig<T> = {
-  columns?: {
-    /** Whether due date should be displayed (@default false). */
-    dueOn?: boolean;
-    /** Property name for ratings from external sources such as IMDB. */
-    externalRating?: string & keyof(T);
-    /** Property name for ratings from user of this vault. */
-    internalRating?: string & keyof(T);
-    /** Whether priority should be displayed (@default false). */
-    priority?: boolean;
-    /** Whether status should be displayed (@default false). */
-    status?: boolean;
-  };
-  filterType: GetTaskTableFilterType;
-  folder: string;
-  limit?: number;
-};
 
 type TaskNote = (
   BaseTaskNote
@@ -50,9 +31,10 @@ export async function getTaskTable<T extends TaskNote>(
     obsidianApi
   } = apis;
   const {
-    folder,
     columns,
-    limit
+    folder,
+    limit,
+    page
   } = config;
   const {
     'metadata-menu': { api: metadataMenuApi }
@@ -62,6 +44,7 @@ export async function getTaskTable<T extends TaskNote>(
 
   const pages = queryNotes(dataviewApi, {
     limit,
+    page,
     source: `"${folder}"`,
     sort: filterConfigs<DataviewSortConfig<T>>([
       ((!columns?.priority) ? null : {
@@ -184,15 +167,20 @@ function getFilter<T extends TaskNote>(
       };
     case GetTaskTableFilterType.toDo:
       return (page) => {
+        const isDone = (innerPage: ObsidianPage<T>) => {
+          return (
+            innerPage.tags?.includes('abandoned')
+            || (
+              innerPage.status.display === 'Done'
+              && !innerPage.tags?.includes('redo')
+            )
+          );
+        };
         return (
-          !page.tags?.includes('abandoned')
-          && (
-            page.status.display !== 'Done'
-            || page.tags?.includes('redo')
-          )
+          !isDone(page)
           && (
             !page.prior
-            || dataviewApi.page<T>(page.prior).status.display === 'Done'
+            || isDone(dataviewApi.page<T>(page.prior))
           )
         );
       };
