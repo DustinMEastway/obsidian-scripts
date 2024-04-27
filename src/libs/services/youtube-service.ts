@@ -144,12 +144,12 @@ export class YoutubeService {
       brandingSettings: {
         image: {
           bannerExternalUrl
-        }
+        } = {}
       }
     } = channel;
 
     return {
-      banner: bannerExternalUrl,
+      banner: bannerExternalUrl ?? 'null',
       description: (description) ? `\n\n${removeHtmlTags(description)}` : '',
       id,
       url: `${youtubeUrl}/${customUrl}`,

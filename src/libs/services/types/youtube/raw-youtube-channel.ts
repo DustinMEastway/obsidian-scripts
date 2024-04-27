@@ -16,7 +16,7 @@ export type RawYoutubeChannel = {
     };
   };
   brandingSettings: {
-    image: {
+    image?: {
       bannerExternalUrl: string;
     };
   };
