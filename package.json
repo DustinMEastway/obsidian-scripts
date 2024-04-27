@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "node build-directory.mjs src/scripts build",
-    "build:w": "yarn build --watch",
+    "build:w": "npm run build -- --watch",
     "check:types": "npx tsc"
   }
 }
