@@ -69,9 +69,9 @@ export class GoodreadsService {
       _,
       seriesName
     ]) => {
-      return removeHtmlTags(seriesName);
+      return createMarkdownFileName(seriesName);
     });
-    const title = removeHtmlTags(searches.authorTitle.exec(mainContent)?.[0] ?? '');
+    const title = createMarkdownFileName(searches.authorTitle.exec(mainContent)?.[0] ?? '');
 
     return {
       cover,
@@ -191,7 +191,7 @@ export class GoodreadsService {
         { book: { bookTitleBare: bookTitle } },
         index
       ) => {
-        bookTitle = removeHtmlTags(bookTitle);
+        bookTitle = createMarkdownFileName(bookTitle);
         const bookAlias = `${bookTitle} (${seriesHeaders[index]})`;
 
         return `## ${bookAlias}\n\n![[${NoteFolder.book}/${bookTitle}#Description]]`;
