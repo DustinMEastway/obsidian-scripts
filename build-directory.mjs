@@ -14,7 +14,7 @@ import {
 
 let [,, source, destination] = process.argv;
 let extraDestinations = [];
-const notesSyncPath = process.env.NOTES_SYNC_PATH;
+const notesSyncPath = process.env.NOTES_PATH;
 if (destination.includes(',') || notesSyncPath) {
   extraDestinations = [
     ...destination.split(','),
