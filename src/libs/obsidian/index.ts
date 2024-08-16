@@ -1,3 +1,4 @@
+export * from './check-display-columns';
 export * from './constants';
 export * from './create-error';
 export * from './create-setting-options';

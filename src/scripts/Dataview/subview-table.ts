@@ -1,6 +1,7 @@
 import {
   DataviewSortOrder,
   ViewNote,
+  checkDisplayColumns,
   filterNull,
   getNoteName
 } from '@';
@@ -18,14 +19,23 @@ const pages = dv.pages<ViewNote>(input?.source ?? '"View"').filter((page) => {
     return link.path === current.file.path;
   });
 });
-const displayDiscription = pages.some((page) => {
-  return page.description;
+
+const {
+  displayDiscription,
+  displayPrice,
+  displayUrl
+} = checkDisplayColumns(pages, {
+  displayDiscription: 'description',
+  displayPrice: 'price',
+  displayUrl: 'url'
 });
 
 dv.table(
   filterNull([
+    ((displayPrice) ? 'Price' : null),
     'Name',
-    ((displayDiscription) ? 'Description' : null)
+    ((displayDiscription) ? 'Description' : null),
+    ((displayUrl) ? 'Link' : null),
   ]),
   pages.sort((page) => {
     return page.order ?? 0;
@@ -33,8 +43,12 @@ dv.table(
     return getNoteName(page);
   }, input?.nameOrder ?? DataviewSortOrder.asc).map((page) => {
     return filterNull([
+      ((displayPrice) ? (page as any).price ?? '' : null),
       `[[${page.file.path}|${getNoteName(page)}]]`,
-      ((displayDiscription) ? page.description ?? '' : null)
+      ((displayDiscription) ? page.description ?? '' : null),
+      ((displayUrl) ? (
+        ((page as any).url) ? `[Buy](${(page as any).url})` : ''
+      ) : null)
     ]);
   })
 );
