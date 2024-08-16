@@ -12,7 +12,7 @@ export type RawGoodreadsWork = {
     | RawGoodreadsEntityRef<'Book'>
   );
   choiceAwards: never[];
-  details: RawGoodreadsWorkDetails;
+  details: RawGoodreadsWorkDetails | null;
   editions: {
     __typename: RawGoodreadsType.booksConnection;
     webUrl: string;

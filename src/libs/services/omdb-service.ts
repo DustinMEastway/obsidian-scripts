@@ -119,7 +119,7 @@ export class OmdbService {
     ) ?? '';
   }
 
-  private _convertRating(rating: null | number): null | number {
+  private _convertRating(rating: null | number): number | 'null' {
     return convertRating({
       maxValue: 10,
       minValue: 1,

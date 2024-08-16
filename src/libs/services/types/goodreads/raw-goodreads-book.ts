@@ -12,7 +12,7 @@ export type RawGoodreadsBook = {
   bookGenres: RawGoodreadsBookGenre[];
   bookSeries: RawGoodreadsBookSeries[];
   description: string;
-  details: RawGoodreadsBookDetails;
+  details: RawGoodreadsBookDetails | null;
   id: string;
   imageUrl: string;
   legacyId: number;

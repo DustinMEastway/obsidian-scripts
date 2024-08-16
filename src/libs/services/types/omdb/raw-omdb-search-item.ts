@@ -3,7 +3,7 @@ export type RawOmdbSearchItem = {
   director: string;
   genre: string;
   imdbId: string;
-  imdbRating: null | number;
+  imdbRating: number | null;
   plot: string;
   poster: string;
   released: string;

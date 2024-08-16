@@ -128,7 +128,7 @@ export class GoodreadsService {
       );
     });
     const work = getApolloRef(rawBook.work);
-    const characters = work.details.characters.map((character) => {
+    const characters = (work.details?.characters ?? []).map((character) => {
       return character.name;
     });
     const description = removeHtmlTags(rawBook.description);
@@ -148,10 +148,12 @@ export class GoodreadsService {
         genres,
         { linkDirectory: NoteFolder.genre }
       ),
-      pageCount: rawBook.details.numPages,
-      publishedOn: createDateLink(
-        work.details.publicationTime,
-        { format: DateFormat.datetime }
+      pageCount: rawBook.details?.numPages ?? 'null',
+      publishedOn: (!work.details) ? 'null' : (
+        createDateLink(
+          work.details.publicationTime,
+          { format: DateFormat.datetime }
+        )
       ),
       ratingsGoodreads: this._convertRating(work.stats.averageRating),
       seriesLinks: createMarkdownArray(
@@ -211,7 +213,7 @@ export class GoodreadsService {
     };
   }
 
-  private _convertRating(rating: null | number): null | number {
+  private _convertRating(rating: null | number): number | 'null' {
     return convertRating({
       maxValue: 5,
       minValue: 1,
