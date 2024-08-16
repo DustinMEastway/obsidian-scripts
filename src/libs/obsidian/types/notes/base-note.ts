@@ -4,5 +4,5 @@ import { NoteClass } from './note-class';
 export type BaseNote = {
   class: NoteClass;
   from: ObsidianPageLink[];
-  ratingsDme: number;
+  rating: number;
 };

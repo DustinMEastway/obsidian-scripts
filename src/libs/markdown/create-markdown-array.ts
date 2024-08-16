@@ -35,5 +35,5 @@ export function createMarkdownArray(
     }
 
     return `\n${spaces}- ${prefix}${item}${suffix}`;
-  }).join('');
+  }).sort().join('');
 }

@@ -1,6 +1,6 @@
 import { removeHtmlTags } from '@/html';
 
-const invalidCharacterSearch = /[\\,#%\{\}\/*<>$\'\":@\|]*/g;
+const invalidCharacterSearch = /[\\,#%\{\}\/*<>$:@\|]*/g;
 const multiSpaceSearch = /\s\s+/g;
 
 export function createMarkdownFileName(fileName: string): string {

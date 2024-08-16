@@ -6,9 +6,14 @@ const characterMap = new Map([
   [/&amp;/g, '&'],
   [/&gt;/g, '\\>'],
   [/&lt;/g, '\\<'],
-  [/​|&nbsp;/g, ' '],
+  [/\u200B/g, ''],
+  [/\u00A0|&nbsp;/g, ' '],
+  [/\u000d/g, '\n'],
   // Escape pound signs.
-  [/(\s+)(#\w+\b)/g, '$1\\$2']
+  [/(\s+)(#\w+\b)/g, '$1\\$2'],
+  // Whitespace cleanup.
+  [/\n(\s*\n){2,}/g, '\n\n'],
+  [/^[ \t]+|[ \t]+$/gm, '']
 ]);
 
 export function removeHtmlTags(html: string): string {

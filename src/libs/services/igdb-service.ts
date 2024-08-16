@@ -18,6 +18,10 @@ import {
   RawIgdbSearchGame
 } from './types';
 
+const genreNameMap = new Map([
+  ['Hack and slash/Beat \'em up', 'Hack & Slash - Beat em up']
+]);
+
 export class IgdbService {
   constructor(
     private _httpService: HttpService
@@ -213,7 +217,9 @@ export class IgdbService {
       ),
       similarGameLinks: createGameArray(similarGames),
       typeLinks: createNameArray(
-        genres,
+        genres.map(({ name }) => {
+          return { name: genreNameMap.get(name) ?? name };
+        }),
         NoteFolder.videoGameType
       ),
       url
