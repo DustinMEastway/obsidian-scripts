@@ -1,3 +1,5 @@
+import { MarkdownNumber } from "./types";
+
 export interface ConvertRatingProps {
   maxValue: number;
   minValue: number;
@@ -13,7 +15,7 @@ export function convertRating({
   maxValue,
   minValue,
   value
-}: ConvertRatingProps): number | 'null' {
+}: ConvertRatingProps): MarkdownNumber {
   if (value) {
     value = Math.round(100 * (value - minValue) / (maxValue - minValue));
   }

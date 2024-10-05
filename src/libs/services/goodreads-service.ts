@@ -2,12 +2,12 @@ import { getApolloRefFactory } from '@/apollo';
 import { DateFormat } from '@/date';
 import { removeHtmlTags } from '@/html';
 import {
+  convertRating,
   createDateLink,
   createMarkdownArray,
   createMarkdownFileName,
   createMarkdownLink
 } from '@/markdown';
-import { convertRating } from '@/number';
 import { NoteFolder, createError } from '@/obsidian';
 import { getAllMatches } from '@/string';
 import { HttpService } from './http-service';

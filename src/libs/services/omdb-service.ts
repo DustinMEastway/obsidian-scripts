@@ -1,9 +1,9 @@
 import {
+  convertRating,
   createDateLink,
   createMarkdownArray,
   createMarkdownFileName
 } from '@/markdown';
-import { convertRating } from '@/number';
 import { camelCaseObject } from '@/object';
 import { NoteFolder, createError } from '@/obsidian';
 import { HttpService } from './http-service';
