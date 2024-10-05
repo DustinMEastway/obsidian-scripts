@@ -25,6 +25,16 @@ interface Settings {
   status: TaskStatusOption;
 }
 
+const searchVideoId = new RegExp(
+  '(?:'
+  + [
+    `${youtubeUrl}/watch\\?.*\\bv=`,
+    // Search YouTube shorthand.
+    'https?://youtu.be/'
+  ].join('|')
+  + ')([^&?]+)'
+);
+
 async function entry(
   entryApis: EntryApis,
   configOptions: Record<string, Settings[keyof(Settings)]>
@@ -53,7 +63,7 @@ async function entry(
     throw createError('No query entered.');
   }
 
-  const videoId = new RegExp(`${youtubeUrl}/watch\\?.*\\bv=([^&]+)`).exec(query)?.[1];
+  const videoId = searchVideoId.exec(query)?.[1];
   if (videoId) {
     query = videoId;
   } else if (query.startsWith(`${youtubeUrl}/`)) {
