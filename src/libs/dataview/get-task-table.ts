@@ -1,3 +1,4 @@
+import { filterNull } from '@/array';
 import {
   BaseTaskNote,
   GetTaskTableConfig,
@@ -46,7 +47,7 @@ export async function getTaskTable<T extends TaskNote>(
     limit,
     page,
     source: `"${folder}"`,
-    sort: filterConfigs<DataviewSortConfig<T>>([
+    sort: filterNull<DataviewSortConfig<T>>([
       ((!columns?.priority) ? null : {
         desc: true,
         property: (page) => {
@@ -95,7 +96,7 @@ export async function getTaskTable<T extends TaskNote>(
   }
 
   await getTable(dataviewApi, {
-    columns: filterConfigs<DataviewColumnConfig<T>>([
+    columns: filterNull<DataviewColumnConfig<T>>([
       ((!includeCover) ? null : {
         property: (page) => {
           return `![|200](${page.cover})`;
@@ -128,7 +129,10 @@ export async function getTaskTable<T extends TaskNote>(
       }),
       ((!columns?.internalRating) ? null : {
         property: (page) => {
-          return metadataMenuApi.fieldModifier(dataviewApi, page, columns.internalRating!);
+          const internalRating = page[columns.internalRating!];
+          return (internalRating === 0) ? internalRating : (
+            metadataMenuApi.fieldModifier(dataviewApi, page, columns.internalRating!)
+          );
         },
         title: 'Rating'
       }),
@@ -141,12 +145,6 @@ export async function getTaskTable<T extends TaskNote>(
     ]),
     source: pages
   });
-}
-
-function filterConfigs<T>(items: (T | null)[]): T[] {
-  return items.filter((item) => {
-    return item != null;
-  }) as T[];
 }
 
 function getFilter<T extends TaskNote>(
