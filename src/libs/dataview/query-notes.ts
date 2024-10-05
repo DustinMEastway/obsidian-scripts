@@ -1,3 +1,4 @@
+import { PaginationConfig, paginate } from '@/array';
 import {
   DataviewApi,
   DataArray,
@@ -9,12 +10,7 @@ export type QueryNotesConfig<T> = {
   /** @deprecated Use @see page.size instead. */
   limit?: number;
   /** Pagination for the query. */
-  page?: {
-    /** Page number (starting at 0) to query. */
-    number?: number;
-    /** Size of each page. */
-    size: number;
-  };
+  page?: PaginationConfig;
   /** Properties to sort by in order of most to least importance. */
   sort?: DataviewSortConfig<T>[];
   /** Source notes to start querying off from. */
@@ -50,25 +46,11 @@ export function queryNotes<T>(
     }, (desc) ? DataviewSortOrder.desc : DataviewSortOrder.asc);
   });
 
-  let {
-    number,
+  pages = paginate(pages, {
+    ...page,
     // Fallback to deprecated limit property.
-    size = limit
-  } = page ?? {};
-  if (
-    typeof size === 'number'
-    && size >= 0
-  ) {
-    number = (
-      typeof number === 'number'
-      && number >= 0
-    ) ? number : 0;
-    const start = number * size;
-    pages = pages.slice(
-      start,
-      start + size
-    );
-  }
+    size: page?.size ?? limit ?? -1
+  });
 
   return pages;
 }
