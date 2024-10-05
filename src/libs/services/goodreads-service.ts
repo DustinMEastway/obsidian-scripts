@@ -2,12 +2,16 @@ import { getApolloRefFactory } from '@/apollo';
 import { DateFormat } from '@/date';
 import { removeHtmlTags } from '@/html';
 import {
+  averageMarkdownNumber,
+  combineMarkdownArray,
   convertRating,
   createDateLink,
   createMarkdownArray,
   createMarkdownFileName,
-  createMarkdownLink
+  createMarkdownLink,
+  sumMarkdownNumber
 } from '@/markdown';
+import { pick } from '@/object';
 import { NoteFolder, createError } from '@/obsidian';
 import { getAllMatches } from '@/string';
 import { HttpService } from './http-service';
@@ -19,7 +23,6 @@ import {
   RawGoodreadsBookSeriesBooks,
   RawGoodreadsBookSeriesData,
   RawGoodreadsBookSeriesDescription,
-  RawGoodreadsBookSeriesNumWorks,
   RawGoodreadsContributorRole,
   RawGoodreadsNextData,
   RawGoodreadsType
@@ -31,8 +34,9 @@ const searches = {
   authorId: /goodreads\.com\/author\/show\/(\d+\.[^?]+)/,
   authorSeries: /<div class="seriesDesc"[^>]*>\s*(<span itemprop='name'[\s\S]*?<\/span>)\s*(<span class="bookMeta">[\s\S]*?<\/span>)/g,
   authorTitle: /<h1\b[\s\S]*?\bclass="authorName"[\s\S]*?<\/h1>/,
-  seriesData: /\bdata-react-props="([\s\S]*?)"/g
-}
+  seriesData: /\bdata-react-props="([\s\S]*?)"/g,
+  singleBook: /^Book \d+(\.\d+)?$/
+};
 
 export class GoodreadsService {
   constructor(
@@ -63,7 +67,7 @@ export class GoodreadsService {
         url: `https://www.goodreads.com/series/list?id=${authorId}`
       })
     ]);
-    const cover = searches.authorCover.exec(mainContent)?.[1] ?? '';
+    const cover = searches.authorCover.exec(mainContent)?.[1] ?? 'null';
     const description = removeHtmlTags(searches.authorDescription.exec(mainContent)?.[0] ?? '');
     const series = getAllMatches(searches.authorSeries, seriesListContent).map(([
       _,
@@ -179,35 +183,67 @@ export class GoodreadsService {
       title
     } = seriesData.find(RawGoodreadsBookSeriesDescription.is) ?? {};
     const description = removeHtmlTags(rawDescription?.html ?? '');
-    const {
-      numWorks
-    } = seriesData.find(RawGoodreadsBookSeriesNumWorks.is) ?? {};
-    const booksData = seriesData.filter(
-      RawGoodreadsBookSeriesBooks.is
-    );
-    const books = booksData.map(({
-      series,
-      seriesHeaders
-    }) => {
-      return series.map((
-        { book: { bookTitleBare: bookTitle } },
-        index
-      ) => {
-        bookTitle = createMarkdownFileName(bookTitle);
-        const bookAlias = `${bookTitle} (${seriesHeaders[index]})`;
+    const books = await Promise.all(
+      seriesData.filter(
+        RawGoodreadsBookSeriesBooks.is
+      ).flatMap(({
+        series,
+        seriesHeaders
+      }) => {
+        return series.map(({ book: { bookUrl } }, index) => {
+          const labelInSeries = seriesHeaders[index];
+          return { bookUrl, labelInSeries };
+        }).filter(({ labelInSeries }) => {
+          return searches.singleBook.test(labelInSeries);
+        }).map(async ({
+          bookUrl,
+          labelInSeries
+        }) => {
+          const book = await this.getBook(`https://www.goodreads.com/${bookUrl}`);
+          const bookTitle = createMarkdownFileName(book.title);
+          const alias = `${bookTitle} (${labelInSeries})`;
 
-        return `## ${bookAlias}\n\n![[${NoteFolder.book}/${bookTitle}#Description]]`;
-      }).join('\n\n');
+          return {
+            ...pick(book, [
+              'authorLinks',
+              'characterLinks',
+              'cover',
+              'genreLinks',
+              'pageCount',
+              'publishedOn',
+              'ratingsGoodreads'
+            ]),
+            header: `## ${alias}\n\n![[${NoteFolder.book}/${bookTitle}#Description]]`,
+            labelInSeries
+          };
+        });
+      })
+    );
+
+    const bookHeaders = books.map(({ header }) => {
+      return header;
     }).join('\n\n');
 
+    const firstBook = books.find(({ labelInSeries }) => {
+      return labelInSeries === 'Book 1';
+    }) ?? books[0];
+    const ratingsGoodreads = averageMarkdownNumber(books, { key: 'ratingsGoodreads' });
+
     return {
-      authorLinks: createMarkdownArray(
-        [booksData[0].series[0].book.author.name],
-        { linkDirectory: NoteFolder.author }
-      ),
-      bookCount: numWorks ?? 0,
-      books: (books) ? `\n\n${books}` : '',
+      authorLinks: combineMarkdownArray(books, { key: 'authorLinks' }),
+      characterLinks: combineMarkdownArray(books, { key: 'characterLinks' }),
+      bookCount: books.length,
+      books: (bookHeaders) ? `\n\n${bookHeaders}` : '',
+      cover: firstBook?.cover ?? 'null',
       description: (description) ? `\n\n${description}`: '',
+      genreLinks: combineMarkdownArray(books, { key: 'genreLinks' }),
+      pageCount: sumMarkdownNumber(books, { key: 'pageCount' }),
+      publishedOn: books.map((book) => {
+        return book.publishedOn;
+      }).sort()[0] ?? 'null',
+      ratingsGoodreads: (ratingsGoodreads === 'null') ? ratingsGoodreads : (
+        Math.floor(ratingsGoodreads)
+      ),
       title: title ?? '',
       url
     };

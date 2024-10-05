@@ -1,13 +1,13 @@
 export type GoodreadsBook = {
-  authorLinks: string | null;
-  characterLinks: string | null;
+  authorLinks: string;
+  characterLinks: string;
   cover: string;
   description: string;
-  genreLinks: string | null;
+  genreLinks: string;
   pageCount: number | 'null';
   publishedOn: string;
   ratingsGoodreads: number | 'null';
-  seriesLinks: string | null;
+  seriesLinks: string;
   title: string;
   url: string;
 }
